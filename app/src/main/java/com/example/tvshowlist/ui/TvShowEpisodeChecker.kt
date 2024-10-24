@@ -2,6 +2,7 @@ package com.example.tvshowlist.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
@@ -44,10 +46,9 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
         mutableIntStateOf(0)
     }
 
-    val seasonList = arrayListOf<Int>()
-    for (i in 1..(tvShow.value?.seasonCount ?: 1)) {
-        seasonList.add(i)
-    }
+    val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
+
+
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
@@ -60,6 +61,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 .fillMaxWidth()
                 .padding(innerPadding)
                 .clickable(onClick = { isSeasonsDropDownExpanded = true })
+                .border(2.dp, MaterialTheme.colorScheme.scrim),
         ) {
             Text(
                 text = "Seasons",
