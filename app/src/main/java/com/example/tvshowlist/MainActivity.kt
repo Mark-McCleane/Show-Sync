@@ -1,0 +1,68 @@
+package com.example.tvshowlist
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.tvshowlist.domain.model.TvShow
+import com.example.tvshowlist.domain.model.ParcelableType
+import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
+import com.example.tvshowlist.ui.SearchField
+import com.example.tvshowlist.ui.TvShowEpisodeChecker
+import com.example.tvshowlist.ui.theme.TvShowListTheme
+import com.example.tvshowlist.utils.ViewModelProviderFactory
+import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            TvShowListTheme {
+                val viewModelProviderFactory = ViewModelProviderFactory(SearchTVShowsRepository())
+                val viewModel =
+                    ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = SearchScreen){
+                    composable<SearchScreen>{
+                        SearchField(
+                            viewModel = viewModel,
+                            navigateTo = {
+                                navController.navigate(TvShowCheckerScreen(it.id, it.title))
+                            }
+                        )
+                    }
+
+                    composable<TvShowCheckerScreen>(
+                        typeMap = mapOf(typeOf<TvShow>() to ParcelableType<TvShow>())
+                    ){ backStackEntry ->
+                        val args = backStackEntry.toRoute<TvShowCheckerScreen>()
+                        TvShowEpisodeChecker(id = args.tvShowId, name = args.name)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Serializable
+object SearchScreen
+
+@Serializable
+data class TvShowCheckerScreen(val tvShowId: Int, val name: String)
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    TvShowListTheme {
+        SearchField(MainViewModel(repository = SearchTVShowsRepository()), navigateTo = {})
+    }
+}
