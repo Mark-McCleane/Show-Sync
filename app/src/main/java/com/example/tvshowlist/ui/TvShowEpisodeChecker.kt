@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,7 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
@@ -60,58 +60,63 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
             )
         })
     }) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .clickable(onClick = { isSeasonsDropDownExpanded = true }),
-        ) {
-            Text(
-                text = "Seasons",
-                textAlign = TextAlign.Center,
-                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .align(Alignment.Center)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_24),
-                contentDescription = "Tv Series Seasons Dropdown",
-                modifier = Modifier.align(Alignment.CenterEnd),
-            )
-
-            DropdownMenu(
-                expanded = isSeasonsDropDownExpanded,
-                onDismissRequest = { isSeasonsDropDownExpanded = false },
-                modifier = Modifier.wrapContentSize()
-            ) {
-                seasonList.forEachIndexed { index, seasonNumber ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(text = "Season $seasonNumber")
-                        },
-                        onClick = {
-                            seasonSelectedIndex = index
-                            isSeasonsDropDownExpanded = false
-                            Toast.makeText(
-                                context,
-                                "Season $seasonNumber Selected",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
-                }
-                //use https://developer.themoviedb.org/reference/tv-season-details
-            }
-        }
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
         ) {
-            itemsIndexed(seasonEpisodes.value) { index, seasonEpisode ->
-                Text(text = "Episode ${seasonEpisode.episodeName} which aired in ${seasonEpisode.episodeAirDate}!\nOverview\t${seasonEpisode.overview}")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
+                    .clickable(onClick = { isSeasonsDropDownExpanded = true }),
+            ) {
+                Text(
+                    text = "Seasons",
+                    textAlign = TextAlign.Center,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.Center)
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_24),
+                    contentDescription = "Tv Series Seasons Dropdown",
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                )
+
+                DropdownMenu(
+                    expanded = isSeasonsDropDownExpanded,
+                    onDismissRequest = { isSeasonsDropDownExpanded = false },
+                    modifier = Modifier.wrapContentSize()
+                ) {
+                    seasonList.forEachIndexed { index, seasonNumber ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = "Season $seasonNumber")
+                            },
+                            onClick = {
+                                seasonSelectedIndex = index
+                                isSeasonsDropDownExpanded = false
+                                Toast.makeText(
+                                    context,
+                                    "Season $seasonNumber Selected",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+                    }
+                    //use https://developer.themoviedb.org/reference/tv-season-details
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                itemsIndexed(seasonEpisodes.value) { index, seasonEpisode ->
+                    Text(text = "Episode ${seasonEpisode.episodeName} which aired in ${seasonEpisode.episodeAirDate}!\nOverview\t${seasonEpisode.overview}")
+                }
             }
         }
     }
