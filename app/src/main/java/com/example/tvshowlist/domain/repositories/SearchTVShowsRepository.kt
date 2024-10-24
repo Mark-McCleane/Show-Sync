@@ -1,6 +1,7 @@
 package com.example.tvshowlist.domain.repositories
 
 import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
+import com.example.tvshowlist.data.entities.getTvShowSeason.GetSeasonApiResponse
 import com.example.tvshowlist.data.entities.search.SearchApiResponse
 import com.example.tvshowlist.data.remote.RetrofitInstance
 
@@ -11,4 +12,7 @@ class SearchTVShowsRepository {
 
     suspend fun getTVShowById(tvShowId: Int): GetTvShowApiResponse =
         RetrofitInstance.api.getTvShowById(id = tvShowId)
+
+    suspend fun getTvShowSeason(tvShowId: Int, seasonNumber: Int = 1): GetSeasonApiResponse =
+        RetrofitInstance.api.getSeasonById(tvId = tvShowId, seasonNumber = seasonNumber)
 }

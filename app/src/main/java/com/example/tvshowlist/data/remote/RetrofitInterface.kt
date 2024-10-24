@@ -1,6 +1,7 @@
 package com.example.tvshowlist.data.remote
 
 import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
+import com.example.tvshowlist.data.entities.getTvShowSeason.GetSeasonApiResponse
 import com.example.tvshowlist.data.entities.search.SearchApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -23,6 +24,14 @@ interface RetrofitInterface {
         @Path("id") id: Int,
         @Query("language") language: String = "en-US"
     ): GetTvShowApiResponse
+
+    //    https://api.themoviedb.org/3/tv/1402/season/1?language=en-US
+    @GET("tv/{tv_id}/season/{season_number}")
+    suspend fun getSeasonById(
+        @Path("tv_id") tvId: Int,
+        @Path("season_number") seasonNumber: Int = 1,
+        @Query("language") language: String = "en-US"
+    ): GetSeasonApiResponse
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"

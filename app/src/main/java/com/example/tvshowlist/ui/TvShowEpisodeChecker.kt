@@ -2,12 +2,14 @@ package com.example.tvshowlist.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +39,9 @@ import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 @Composable
 fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     viewModel.getTvShowById(tvShowId)
+    viewModel.getTvShowSeasons(tvShowId)
     val tvShow = viewModel.selectedTvShow.collectAsState()
+    val seasonEpisodes = viewModel.selectedSeason.collectAsState()
     val context = LocalContext.current
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
@@ -60,8 +64,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
-                .clickable(onClick = { isSeasonsDropDownExpanded = true })
-                .border(2.dp, MaterialTheme.colorScheme.scrim),
+                .clickable(onClick = { isSeasonsDropDownExpanded = true }),
         ) {
             Text(
                 text = "Seasons",
@@ -73,7 +76,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
             )
 
             Image(
-                painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_circle_24),
+                painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_24),
                 contentDescription = "Tv Series Seasons Dropdown",
                 modifier = Modifier.align(Alignment.CenterEnd),
             )
@@ -81,7 +84,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
             DropdownMenu(
                 expanded = isSeasonsDropDownExpanded,
                 onDismissRequest = { isSeasonsDropDownExpanded = false },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.wrapContentSize()
             ) {
                 seasonList.forEachIndexed { index, seasonNumber ->
                     DropdownMenuItem(
@@ -102,7 +105,15 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 //use https://developer.themoviedb.org/reference/tv-season-details
             }
         }
-
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            itemsIndexed(seasonEpisodes.value) { index, seasonEpisode ->
+                Text(text = "Episode ${seasonEpisode.episodeName} which aired in ${seasonEpisode.episodeAirDate}!\nOverview\t${seasonEpisode.overview}")
+            }
+        }
     }
 }
 
