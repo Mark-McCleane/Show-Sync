@@ -45,7 +45,10 @@ class MainActivity : ComponentActivity() {
                         typeMap = mapOf(typeOf<TvShow>() to ParcelableType<TvShow>())
                     ){ backStackEntry ->
                         val args = backStackEntry.toRoute<TvShowCheckerScreen>()
-                        TvShowEpisodeChecker(id = args.tvShowId, name = args.name)
+                        TvShowEpisodeChecker(
+                            tvShowId = args.tvShowId,
+                            viewModel = viewModel,
+                        )
                     }
                 }
             }

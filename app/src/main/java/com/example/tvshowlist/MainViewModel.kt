@@ -3,10 +3,12 @@ package com.example.tvshowlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.AppMapper
-import com.example.tvshowlist.data.entities.Result
+import com.example.tvshowlist.data.entities.search.Result
 import com.example.tvshowlist.domain.model.TvShow
+import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +29,9 @@ class MainViewModel(
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
+
+    private val _selectedTvShow = MutableStateFlow<TvShowExtended?>(null)
+    val selectedTvShow = _selectedTvShow.asStateFlow()
 
     private val _tvShowList = MutableStateFlow(listOf<TvShow>())
     val tvShowList = searchText
@@ -58,8 +63,16 @@ class MainViewModel(
         temp.forEach {
             duplicateRemoverSet.add(it)
         }
-        val tvShowList = AppMapper.mapApiResultToTvShow(duplicateRemoverSet.toList())
+        val tvShowList = AppMapper.mapGetTvShowsApiResultToTvShowList(duplicateRemoverSet.toList())
         _tvShowList.update { tvShowList }
         return tvShowList
+    }
+
+    fun getTvShowById(tvShowId: Int) {
+        viewModelScope.launch {
+            val apiResult = repository.getTVShowById(tvShowId)
+            val result = AppMapper.mapGetTvShowByIdApiResultToTvShow(apiResult)
+            _selectedTvShow.update { result }
+        }
     }
 }

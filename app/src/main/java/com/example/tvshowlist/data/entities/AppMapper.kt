@@ -1,10 +1,13 @@
 package com.example.tvshowlist.data.entities
 
+import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
+import com.example.tvshowlist.data.entities.search.Result
 import com.example.tvshowlist.domain.model.TvShow
+import com.example.tvshowlist.domain.model.TvShowExtended
 
 class AppMapper {
     companion object {
-        fun mapApiResultToTvShow(apiResult: List<Result>): List<TvShow> {
+        fun mapGetTvShowsApiResultToTvShowList(apiResult: List<Result>): List<TvShow> {
             val tvShowList = mutableListOf<TvShow>()
 
             apiResult.forEach {
@@ -22,6 +25,12 @@ class AppMapper {
             return tvShowList
         }
 
-
+        fun mapGetTvShowByIdApiResultToTvShow(apiResult: GetTvShowApiResponse): TvShowExtended {
+            return TvShowExtended(
+                tvShowId = apiResult.id,
+                title = apiResult.name,
+                seasonCount = apiResult.number_of_seasons
+            )
+        }
     }
 }

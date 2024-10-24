@@ -1,4 +1,4 @@
-package com.example.tvshowlist.data.entities
+package com.example.tvshowlist.data.entities.search
 
 data class Result(
     val adult: Boolean?,
