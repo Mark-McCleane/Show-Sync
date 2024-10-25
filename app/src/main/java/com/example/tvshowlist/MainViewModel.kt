@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.AppMapper
 import com.example.tvshowlist.data.entities.search.Result
-import com.example.tvshowlist.data.remote.TvShowSeason
+import com.example.tvshowlist.domain.model.TvShowSeason
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository

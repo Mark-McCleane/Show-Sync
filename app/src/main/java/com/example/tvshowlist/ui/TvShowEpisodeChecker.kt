@@ -1,6 +1,5 @@
 package com.example.tvshowlist.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,31 +26,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
+import com.example.tvshowlist.ui.items.ItemTvShowChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
-    viewModel.getTvShowById(tvShowId)
-    viewModel.getTvShowSeasons(tvShowId)
     val tvShow = viewModel.selectedTvShow.collectAsState()
     val seasonEpisodes = viewModel.selectedSeason.collectAsState()
-    val context = LocalContext.current
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
     }
-    var seasonSelectedIndex by remember {
-        mutableIntStateOf(0)
+    var seasonSelected by remember {
+        mutableIntStateOf(1)
     }
+    viewModel.getTvShowById(tvShowId)
+    viewModel.getTvShowSeasons(tvShowId, seasonSelected)
 
     val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
-
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -61,8 +58,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
         })
     }) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Box(
                 modifier = Modifier
@@ -91,31 +87,25 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                     modifier = Modifier.wrapContentSize()
                 ) {
                     seasonList.forEachIndexed { index, seasonNumber ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = "Season $seasonNumber")
-                            },
-                            onClick = {
-                                seasonSelectedIndex = index
-                                isSeasonsDropDownExpanded = false
-                                Toast.makeText(
-                                    context,
-                                    "Season $seasonNumber Selected",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        )
+                        DropdownMenuItem(text = {
+                            Text(
+                                text = "Season $seasonNumber",
+                                textAlign = TextAlign.Center
+                            )
+                        }, onClick = {
+                            seasonSelected = seasonNumber
+                            isSeasonsDropDownExpanded = false
+
+                        })
                     }
-                    //use https://developer.themoviedb.org/reference/tv-season-details
                 }
             }
 
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
-                itemsIndexed(seasonEpisodes.value) { index, seasonEpisode ->
-                    Text(text = "Episode ${seasonEpisode.episodeName} which aired in ${seasonEpisode.episodeAirDate}!\nOverview\t${seasonEpisode.overview}")
+                itemsIndexed(seasonEpisodes.value.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
+                    ItemTvShowChecker(tvShowSeason = seasonEpisode)
                 }
             }
         }

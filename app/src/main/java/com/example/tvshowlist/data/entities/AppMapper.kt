@@ -3,7 +3,9 @@ package com.example.tvshowlist.data.entities
 import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
 import com.example.tvshowlist.data.entities.getTvShowSeason.GetSeasonApiResponse
 import com.example.tvshowlist.data.entities.search.Result
-import com.example.tvshowlist.data.remote.TvShowSeason
+import com.example.tvshowlist.data.remote.RetrofitInstance
+import com.example.tvshowlist.data.remote.RetrofitInterface
+import com.example.tvshowlist.domain.model.TvShowSeason
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
 
@@ -42,9 +44,12 @@ class AppMapper {
                     TvShowSeason(
                         episodeId = it.id,
                         episodeName = it.name,
+                        episodeNumber = it.episode_number,
                         episodeAirDate = it.air_date,
                         overview = it.overview,
-                        voteAverage = it.vote_average
+                        voteAverage = it.vote_average,
+                        episodeImage = RetrofitInterface.IMAGE_BASE_URL + it.still_path, //eg. /8BUXYeIeRajrgfJawYXCPAMwzkw.jpg
+                        seasonNumber = it.season_number
                     )
                 )
             }

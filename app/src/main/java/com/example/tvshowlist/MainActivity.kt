@@ -31,20 +31,20 @@ class MainActivity : ComponentActivity() {
                 val viewModel =
                     ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = SearchScreen){
-                    composable<SearchScreen>{
+                NavHost(navController = navController, startDestination = SearchScreenRoute){
+                    composable<SearchScreenRoute>{
                         SearchField(
                             viewModel = viewModel,
                             navigateTo = {
-                                navController.navigate(TvShowCheckerScreen(it.id, it.title))
+                                navController.navigate(TvShowCheckerScreenRoute(it.id, it.title))
                             }
                         )
                     }
 
-                    composable<TvShowCheckerScreen>(
+                    composable<TvShowCheckerScreenRoute>(
                         typeMap = mapOf(typeOf<TvShow>() to ParcelableType<TvShow>())
                     ){ backStackEntry ->
-                        val args = backStackEntry.toRoute<TvShowCheckerScreen>()
+                        val args = backStackEntry.toRoute<TvShowCheckerScreenRoute>()
                         TvShowEpisodeChecker(
                             tvShowId = args.tvShowId,
                             viewModel = viewModel,
@@ -57,10 +57,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Serializable
-object SearchScreen
+object SearchScreenRoute
 
 @Serializable
-data class TvShowCheckerScreen(val tvShowId: Int, val name: String)
+data class TvShowCheckerScreenRoute(val tvShowId: Int, val name: String)
 
 @Preview(showBackground = true)
 @Composable
