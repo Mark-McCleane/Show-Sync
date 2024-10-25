@@ -1,18 +1,18 @@
 package com.example.tvshowlist.ui.items
 
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,20 +26,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.tvshowlist.domain.model.TvShowSeason
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Locale
 
 @Composable
 fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
     var isOverviewExpanded by remember { mutableStateOf(false) }
+    var isWatched by remember { mutableStateOf(false) }
     Card(modifier = Modifier.padding(4.dp)) {
         Row(
             modifier = Modifier
-                .wrapContentSize()
-                .padding(8.dp)
+                .fillMaxWidth()
         ) {
             AsyncImage(
                 model = tvShowSeason.episodeImage,
@@ -47,39 +51,46 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                 contentDescription = "${tvShowSeason.episodeName} Episode Image",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .sizeIn(
-                        minWidth = 150.dp,
-                        minHeight = 150.dp,
-                        maxWidth = 170.dp,
-                        maxHeight = 170.dp
-                    )
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Column(
-                Modifier
-                    .wrapContentHeight()
-                    .wrapContentWidth()
+                Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${tvShowSeason.episodeNumber}.\t${tvShowSeason.episodeName}",
+                    text = "${tvShowSeason.episodeNumber}. ${tvShowSeason.episodeName}",
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Row(modifier = Modifier.wrapContentSize()) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Star Icon",
-                        tint = androidx.compose.ui.graphics.Color.Yellow
+                        tint = androidx.compose.ui.graphics.Color.Yellow,
+                        modifier = Modifier.weight(0.20f)
                     )
                     val rating =
                         String.format(Locale.getDefault(), "%.1f", tvShowSeason.voteAverage)
                     Text(
-                        text = "${rating}\t\t",
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.align(Alignment.CenterVertically)
+                        text = rating,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .weight(0.25f)
                     )
+                    val airDate = formatDate(tvShowSeason.episodeAirDate)
                     Text(
-                        text = tvShowSeason.episodeAirDate,
-                        modifier = Modifier.align(Alignment.CenterVertically)
+                        text = airDate,
+                        maxLines = 1,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .weight(1f)
                     )
                 }
                 Divider(thickness = 2.dp)
@@ -90,7 +101,35 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                     maxLines = if (isOverviewExpanded) Int.MAX_VALUE else 4
                 )
             }
+            Column(
+                Modifier
+                    .weight(weight = 0.35f)
+                    .align(Alignment.CenterVertically),
+                horizontalAlignment = Alignment.End
+            ) {
+                Checkbox(
+                    checked = isWatched,
+                    onCheckedChange = { isWatched = !isWatched },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
+    }
+}
+
+fun formatDate(episodeAirDate: String): String {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return episodeAirDate
+
+    val inputFormatter = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd",
+        Locale.getDefault()
+    ) // Assuming your original format
+    val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+    return try {
+        val date = LocalDate.parse(episodeAirDate, inputFormatter)
+        date.format(outputFormatter)
+    } catch (e: DateTimeParseException) {
+        episodeAirDate
     }
 }
 
