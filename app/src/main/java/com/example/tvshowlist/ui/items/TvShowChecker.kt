@@ -40,7 +40,11 @@ import java.util.Locale
 fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
     var isOverviewExpanded by remember { mutableStateOf(false) }
     var isWatched by remember { mutableStateOf(false) }
-    Card(modifier = Modifier.padding(4.dp)) {
+    Card(
+        modifier = Modifier
+            .padding(4.dp)
+            .clickable { isWatched = changeWatchedStatus(isWatched) }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,12 +113,16 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
             ) {
                 Checkbox(
                     checked = isWatched,
-                    onCheckedChange = { isWatched = !isWatched },
+                    onCheckedChange = { isWatched = changeWatchedStatus(isWatched) },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
         }
     }
+}
+
+private fun changeWatchedStatus(isWatched: Boolean): Boolean {
+    return !isWatched
 }
 
 fun formatDate(episodeAirDate: String): String {
@@ -123,7 +131,7 @@ fun formatDate(episodeAirDate: String): String {
     val inputFormatter = DateTimeFormatter.ofPattern(
         "yyyy-MM-dd",
         Locale.getDefault()
-    ) // Assuming your original format
+    )
     val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
     return try {
         val date = LocalDate.parse(episodeAirDate, inputFormatter)

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,14 +41,21 @@ import com.example.tvshowlist.ui.items.ItemTvShowChecker
 fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     val tvShow = viewModel.selectedTvShow.collectAsState()
     val seasonEpisodes = viewModel.selectedSeason.collectAsState()
+    val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
     }
     var seasonSelected by remember {
         mutableIntStateOf(1)
     }
-    viewModel.getTvShowById(tvShowId)
-    viewModel.getTvShowSeasons(tvShowId, seasonSelected)
+
+    LaunchedEffect(key1 = tvShow) {
+        viewModel.getTvShowById(tvShowId)
+    }
+
+    LaunchedEffect(key1 = seasonSelected) {
+        viewModel.getTvShowSeasons(tvShowId, seasonSelected)
+    }
 
     val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
 
@@ -71,14 +80,15 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                     textAlign = TextAlign.Center,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
                     modifier = Modifier
-                        .wrapContentSize()
                         .align(Alignment.Center)
+                        .wrapContentSize()
                 )
 
                 Image(
                     painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_24),
                     contentDescription = "Tv Series Seasons Dropdown",
-                    modifier = Modifier.align(Alignment.CenterEnd),
+                    modifier = Modifier.align(Alignment.Center)
+
                 )
 
                 DropdownMenu(
@@ -95,17 +105,21 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                         }, onClick = {
                             seasonSelected = seasonNumber
                             isSeasonsDropDownExpanded = false
-
                         })
                     }
                 }
             }
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(seasonEpisodes.value.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
-                    ItemTvShowChecker(tvShowSeason = seasonEpisode)
+            if (isEpisodesLoaded) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(seasonEpisodes.value.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
+                        ItemTvShowChecker(tvShowSeason = seasonEpisode)
+                    }
                 }
             }
         }

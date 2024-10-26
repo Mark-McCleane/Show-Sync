@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.AppMapper
 import com.example.tvshowlist.data.entities.search.Result
-import com.example.tvshowlist.domain.model.TvShowSeason
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
+import com.example.tvshowlist.domain.model.TvShowSeason
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,7 +29,15 @@ class MainViewModel(
     val searchText = _searchText.asStateFlow()
 
     private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
+    val isSearching = _isSearching
+        .onStart { getTvShows() }
+        .stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            false
+        )
+
+    private val _isEpisodesLoading = MutableStateFlow(false)
+    val isEpisodesLoading = _isEpisodesLoading.asStateFlow()
 
     private val _selectedTvShow = MutableStateFlow<TvShowExtended?>(null)
     val selectedTvShow = _selectedTvShow.asStateFlow()
@@ -81,9 +90,12 @@ class MainViewModel(
 
     fun getTvShowSeasons(tvShowId: Int, seasonNumber: Int = 1) {
         viewModelScope.launch {
+            _isEpisodesLoading.value = true
             val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
             val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
             _selectedSeason.update { result }
+            _isEpisodesLoading.value = false
+
         }
     }
 }
