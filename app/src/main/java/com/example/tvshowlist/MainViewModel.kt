@@ -2,7 +2,7 @@ package com.example.tvshowlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tvshowlist.data.entities.AppMapper
+import com.example.tvshowlist.data.remote.AppMapper
 import com.example.tvshowlist.data.entities.search.Result
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
