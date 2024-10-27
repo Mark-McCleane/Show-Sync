@@ -9,7 +9,6 @@ import retrofit2.http.Query
 
 interface RetrofitInterface {
 //    https://api.themoviedb.org/3/search/tv?query=test&include_adult=false&language=en-US&page=1
-
     @GET("search/tv")
     suspend fun searchTvShowsByName(
         @Query("query") query: String = "",

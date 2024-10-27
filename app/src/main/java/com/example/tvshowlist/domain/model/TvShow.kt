@@ -14,7 +14,8 @@ data class TvShow(
     val description: String? = "",
     val title: String = "",
     val airDate: String? = "",
-    val posterPath: String? = ""
+    val posterPath: String? = "",
+    var addedToRecentDate: Long? = null,
 ) : Parcelable {
     fun searchTvShow(query: String): Boolean {
         val matchingCombination = listOf(title) + title.trim().split(" ")

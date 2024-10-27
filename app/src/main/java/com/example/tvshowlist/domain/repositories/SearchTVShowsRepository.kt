@@ -19,11 +19,14 @@ class SearchTVShowsRepository(private val dao: TvShowCheckerDao) {
     suspend fun getTvShowSeason(tvShowId: Int, seasonNumber: Int = 1): GetSeasonApiResponse =
         RetrofitInstance.api.getSeasonById(tvId = tvShowId, seasonNumber = seasonNumber)
 
-    suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes) = dao.upsertTvShowChecker(tvShowChecker = tvShow)
-    suspend fun getAllTvShowsSeasonEpisodes(): List<TvShowSeasonEpisodes> = dao.getAllTvShowsSeasonEpisodes()
+    suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes) =
+        dao.upsertTvShowChecker(tvShowChecker = tvShow)
 
+    suspend fun insertRecentTvShow(tvShow: TvShow) = dao.insertRecentTvShow(tvShow = tvShow)
+    suspend fun getRecentTvShows(): List<TvShow> = dao.getRecentTvShows()
     suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean) =
         dao.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatchedStatus)
 
-    suspend fun getIsWatchedStatus(episodeId: Int): Boolean = dao.getIsWatchedStatus(episodeId = episodeId)
+    suspend fun getIsWatchedStatus(episodeId: Int): Boolean =
+        dao.getIsWatchedStatus(episodeId = episodeId)
 }

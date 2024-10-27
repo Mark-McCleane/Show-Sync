@@ -31,9 +31,13 @@ class MainViewModel(
     val isSearching = _isSearching
         .onStart { getTvShows() }
         .stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
             false
         )
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
     private val _isEpisodesLoading = MutableStateFlow(false)
     val isEpisodesLoading = _isEpisodesLoading.asStateFlow()
@@ -59,8 +63,13 @@ class MainViewModel(
             viewModelScope, SharingStarted.WhileSubscribed(5000), _tvShowList.value
         )
 
+    private val _recentTvShowList = MutableStateFlow(listOf<TvShow>())
+    val recentTvShowList = _recentTvShowList.asStateFlow()
+
     init {
-        viewModelScope.launch { getTvShows() }
+        viewModelScope.launch {
+            getRecentTvShows()
+        }
     }
 
     fun onSearchTextChange(text: String) {
@@ -77,6 +86,20 @@ class MainViewModel(
         val tvShowList = AppMapper.mapGetTvShowsApiResultToTvShowList(duplicateRemoverSet.toList())
         _tvShowList.update { tvShowList }
         return tvShowList
+    }
+
+    private suspend fun getRecentTvShows(){
+        val duplicateRemoverSet = mutableSetOf<TvShow>()
+        repository.getRecentTvShows().forEach {
+            duplicateRemoverSet.add(it)
+        }
+        _recentTvShowList.update { duplicateRemoverSet.toList() }
+    }
+
+    fun insertRecentTvShow(tvShow: TvShow) {
+        viewModelScope.launch {
+            repository.insertRecentTvShow(tvShow = tvShow)
+        }
     }
 
     fun getTvShowById(tvShowId: Int) {

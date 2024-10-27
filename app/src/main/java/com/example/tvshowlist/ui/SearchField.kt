@@ -25,29 +25,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tvshowlist.MainViewModel
-import com.example.tvshowlist.data.db.TvShowCheckerDao
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
-import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 import com.example.tvshowlist.ui.items.ItemTvShow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchField(
-    viewModel: MainViewModel,
-    navigateTo: (tvShow: TvShow) -> Unit
+    viewModel: MainViewModel, navigateTo: (tvShow: TvShow) -> Unit
 ) {
     val searchText by viewModel.searchText.collectAsState()
     val tvShowList by viewModel.tvShowList.collectAsState()
+    val recentTvShowList by viewModel.recentTvShowList.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     Scaffold(topBar = { TopAppBar(title = { Text(text = "TV Show App") }) }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -69,15 +67,15 @@ fun SearchField(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isSearching) {
+            if (isSearching || isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             } else {
-                if (tvShowList.isEmpty()) {
+                if (searchText.isEmpty() && recentTvShowList.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = if (searchText.isNotEmpty()) "No Tv Shows Found" else "Please Search For A Tv Show",
+                            text = "Please Search For A Tv Show",
                             style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.ExtraBold),
                             textAlign = TextAlign.Center,
                         )
@@ -88,7 +86,10 @@ fun SearchField(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        items(tvShowList) { tvShow ->
+                        items(
+                            if (searchText.isNotEmpty()) tvShowList
+                            else recentTvShowList
+                        ) {tvShow ->
                             ItemTvShow(
                                 tvShow = tvShow,
                                 tvShowTitle = tvShow.title,

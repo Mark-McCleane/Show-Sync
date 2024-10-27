@@ -21,6 +21,7 @@ import com.example.tvshowlist.ui.TvShowEpisodeChecker
 import com.example.tvshowlist.ui.theme.TvShowListTheme
 import com.example.tvshowlist.utils.ViewModelProviderFactory
 import kotlinx.serialization.Serializable
+import java.time.Instant
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +40,8 @@ class MainActivity : ComponentActivity() {
                         SearchField(
                             viewModel = viewModel,
                             navigateTo = {
+                                it.addedToRecentDate = System.currentTimeMillis()
+                                viewModel.insertRecentTvShow(it)
                                 navController.navigate(TvShowCheckerScreenRoute(it.id, it.title))
                             }
                         )
