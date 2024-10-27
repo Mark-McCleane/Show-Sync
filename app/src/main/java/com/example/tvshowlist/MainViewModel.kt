@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val repository: SearchTVShowsRepository
 ) : ViewModel() {
-
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
@@ -93,14 +92,16 @@ class MainViewModel(
             _isEpisodesLoading.value = true
             val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
             val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
+            result.forEach {
+                it.isChecked = repository.getIsWatchedStatus(it.episodeId)
+                insertTvShowSeasonEpisodesToDB(it)
+            }
             _selectedSeason.update { result }
-            result.forEach { insertTvShowSeasonEpisodesToDB(it) }
             _isEpisodesLoading.value = false
-
         }
     }
 
-    fun insertTvShowSeasonEpisodesToDB(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
+    private fun insertTvShowSeasonEpisodesToDB(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
         viewModelScope.launch {
             repository.insertTvShow(tvShowSeasonEpisodes)
         }

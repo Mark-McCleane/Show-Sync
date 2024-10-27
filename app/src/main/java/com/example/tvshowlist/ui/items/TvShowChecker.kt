@@ -39,7 +39,9 @@ import java.util.Locale
 @Composable
 fun ItemTvShowChecker(tvShowSeasonEpisodes: TvShowSeasonEpisodes, viewModel: MainViewModel) {
     var isOverviewExpanded by remember { mutableStateOf(false) }
-    var isWatched by remember { mutableStateOf(false) }
+    var isWatched by remember {
+        mutableStateOf(tvShowSeasonEpisodes.isChecked ?: false)
+    }
     Card(
         modifier = Modifier
             .padding(4.dp)

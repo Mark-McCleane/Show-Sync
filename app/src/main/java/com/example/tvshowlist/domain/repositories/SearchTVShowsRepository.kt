@@ -24,4 +24,6 @@ class SearchTVShowsRepository(private val dao: TvShowCheckerDao) {
 
     suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean) =
         dao.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatchedStatus)
+
+    suspend fun getIsWatchedStatus(episodeId: Int): Boolean = dao.getIsWatchedStatus(episodeId = episodeId)
 }

@@ -18,4 +18,6 @@ interface TvShowCheckerDao {
     @Query("UPDATE tvShowSeasonEpisodesTable set isChecked = :isWatchedStatus WHERE episodeId = :episodeId")
     suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean)
 
+    @Query("SELECT isChecked FROM tvShowSeasonEpisodesTable WHERE episodeId = :episodeId")
+    suspend fun getIsWatchedStatus(episodeId: Int): Boolean
 }
