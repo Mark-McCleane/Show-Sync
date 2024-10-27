@@ -1,7 +1,11 @@
 package com.example.tvshowlist.domain.model
 
-data class TvShowSeason(
-    val episodeId: Int,
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "tvShowSeasonEpisodesTable")
+data class TvShowSeasonEpisodes(
+    @PrimaryKey val episodeId: Int,
     val episodeName: String,
     val episodeNumber: Int,
     val episodeAirDate: String,

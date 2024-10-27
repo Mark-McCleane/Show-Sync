@@ -2,11 +2,11 @@ package com.example.tvshowlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tvshowlist.data.remote.AppMapper
 import com.example.tvshowlist.data.entities.search.Result
+import com.example.tvshowlist.data.remote.AppMapper
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
-import com.example.tvshowlist.domain.model.TvShowSeason
+import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +42,7 @@ class MainViewModel(
     private val _selectedTvShow = MutableStateFlow<TvShowExtended?>(null)
     val selectedTvShow = _selectedTvShow.asStateFlow()
 
-    private val _selectedSeason = MutableStateFlow(listOf<TvShowSeason>())
+    private val _selectedSeason = MutableStateFlow(listOf<TvShowSeasonEpisodes>())
     val selectedSeason = _selectedSeason.asStateFlow()
 
     private val _tvShowList = MutableStateFlow(listOf<TvShow>())
@@ -94,8 +94,21 @@ class MainViewModel(
             val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
             val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
             _selectedSeason.update { result }
+            result.forEach { insertTvShowSeasonEpisodesToDB(it) }
             _isEpisodesLoading.value = false
 
+        }
+    }
+
+    fun insertTvShowSeasonEpisodesToDB(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
+        viewModelScope.launch {
+            repository.insertTvShow(tvShowSeasonEpisodes)
+        }
+    }
+
+    fun updateIsWatchedState(episodeId: Int, isWatched: Boolean) {
+        viewModelScope.launch {
+            repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
         }
     }
 }

@@ -27,32 +27,38 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.example.tvshowlist.domain.model.TvShowSeason
+import com.example.tvshowlist.MainViewModel
+import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 
 @Composable
-fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
+fun ItemTvShowChecker(tvShowSeasonEpisodes: TvShowSeasonEpisodes, viewModel: MainViewModel) {
     var isOverviewExpanded by remember { mutableStateOf(false) }
     var isWatched by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .clickable { isWatched = changeWatchedStatus(isWatched) }
+            .clickable {
+                isWatched = changeWatchedStatus(
+                    isWatched = isWatched,
+                    viewModel = viewModel,
+                    tvShowSeasonEpisodes.episodeId
+                )
+            }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             AsyncImage(
-                model = tvShowSeason.episodeImage,
+                model = tvShowSeasonEpisodes.episodeImage,
                 error = painterResource(id = android.R.drawable.stat_notify_error),
-                contentDescription = "${tvShowSeason.episodeName} Episode Image",
+                contentDescription = "${tvShowSeasonEpisodes.episodeName} Episode Image",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .weight(1f)
@@ -64,7 +70,7 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                 Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${tvShowSeason.episodeNumber}. ${tvShowSeason.episodeName}",
+                    text = "${tvShowSeasonEpisodes.episodeNumber}. ${tvShowSeasonEpisodes.episodeName}",
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 2,
@@ -79,7 +85,7 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                         modifier = Modifier.weight(0.20f)
                     )
                     val rating =
-                        String.format(Locale.getDefault(), "%.1f", tvShowSeason.voteAverage)
+                        String.format(Locale.getDefault(), "%.1f", tvShowSeasonEpisodes.voteAverage)
                     Text(
                         text = rating,
                         fontWeight = FontWeight.Bold,
@@ -87,7 +93,7 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                             .align(Alignment.CenterVertically)
                             .weight(0.25f)
                     )
-                    val airDate = formatDate(tvShowSeason.episodeAirDate)
+                    val airDate = formatDate(tvShowSeasonEpisodes.episodeAirDate)
                     Text(
                         text = airDate,
                         maxLines = 1,
@@ -100,7 +106,7 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
                 Divider(thickness = 2.dp)
 
                 Text(
-                    text = tvShowSeason.overview,
+                    text = tvShowSeasonEpisodes.overview,
                     modifier = Modifier.clickable { isOverviewExpanded = !isOverviewExpanded },
                     maxLines = if (isOverviewExpanded) Int.MAX_VALUE else 4
                 )
@@ -113,7 +119,13 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
             ) {
                 Checkbox(
                     checked = isWatched,
-                    onCheckedChange = { isWatched = changeWatchedStatus(isWatched) },
+                    onCheckedChange = {
+                        isWatched = changeWatchedStatus(
+                            isWatched = isWatched,
+                            viewModel = viewModel,
+                            episodeId = tvShowSeasonEpisodes.episodeId
+                        )
+                    },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
@@ -121,8 +133,14 @@ fun ItemTvShowChecker(tvShowSeason: TvShowSeason) {
     }
 }
 
-private fun changeWatchedStatus(isWatched: Boolean): Boolean {
-    return !isWatched
+private fun changeWatchedStatus(
+    isWatched: Boolean,
+    viewModel: MainViewModel,
+    episodeId: Int
+): Boolean {
+    val isWatchedChanged = !isWatched
+    viewModel.updateIsWatchedState(isWatched = isWatchedChanged, episodeId = episodeId)
+    return isWatchedChanged
 }
 
 fun formatDate(episodeAirDate: String): String {
@@ -139,20 +157,4 @@ fun formatDate(episodeAirDate: String): String {
     } catch (e: DateTimeParseException) {
         episodeAirDate
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewItemTvShowChecker() {
-    val tvShowSeason = TvShowSeason(
-        episodeId = 1,
-        seasonNumber = 1,
-        overview = "This is an overview",
-        episodeName = "Episode Name",
-        episodeImage = "https://api.themoviedb.org/3/8BUXYeIeRajrgfJawYXCPAMwzkw.jpg",
-        episodeAirDate = "12/05/2024",
-        episodeNumber = 1,
-        voteAverage = 1.555555
-    )
-    ItemTvShowChecker(tvShowSeason)
 }

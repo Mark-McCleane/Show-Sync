@@ -118,16 +118,10 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     itemsIndexed(seasonEpisodes.value.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
-                        ItemTvShowChecker(tvShowSeason = seasonEpisode)
+                        ItemTvShowChecker(tvShowSeasonEpisodes = seasonEpisode, viewModel = viewModel)
                     }
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun TvShowEpisodeCheckerPreview() {
-    TvShowEpisodeChecker(1, MainViewModel(SearchTVShowsRepository()))
 }

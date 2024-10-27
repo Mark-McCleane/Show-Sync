@@ -11,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.tvshowlist.data.db.TvShowCheckerDao
+import com.example.tvshowlist.data.db.TvShowCheckerDatabase
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.ParcelableType
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
@@ -27,7 +29,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TvShowListTheme {
-                val viewModelProviderFactory = ViewModelProviderFactory(SearchTVShowsRepository())
+                val tvShowCheckerDao = TvShowCheckerDatabase.getDatabase(applicationContext).tvShowCheckerDao()
+                val viewModelProviderFactory = ViewModelProviderFactory(SearchTVShowsRepository(tvShowCheckerDao))
                 val viewModel =
                     ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
                 val navController = rememberNavController()
@@ -61,11 +64,3 @@ object SearchScreenRoute
 
 @Serializable
 data class TvShowCheckerScreenRoute(val tvShowId: Int, val name: String)
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TvShowListTheme {
-        SearchField(MainViewModel(repository = SearchTVShowsRepository()), navigateTo = {})
-    }
-}

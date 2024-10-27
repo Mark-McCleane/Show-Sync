@@ -3,7 +3,7 @@ package com.example.tvshowlist.data.remote
 import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
 import com.example.tvshowlist.data.entities.getTvShowSeason.GetSeasonApiResponse
 import com.example.tvshowlist.data.entities.search.Result
-import com.example.tvshowlist.domain.model.TvShowSeason
+import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
 
@@ -34,11 +34,11 @@ class AppMapper {
             )
         }
 
-        fun mapGetTvShowSeasonsApiResultToTvShowSeason(apiResponse: GetSeasonApiResponse): List<TvShowSeason> {
-            val listOfEpisodes = mutableListOf<TvShowSeason>()
+        fun mapGetTvShowSeasonsApiResultToTvShowSeason(apiResponse: GetSeasonApiResponse): List<TvShowSeasonEpisodes> {
+            val listOfEpisodes = mutableListOf<TvShowSeasonEpisodes>()
             apiResponse.episodes.forEach {
                 listOfEpisodes.add(
-                    TvShowSeason(
+                    TvShowSeasonEpisodes(
                         episodeId = it.id,
                         episodeName = it.name,
                         episodeNumber = it.episode_number,

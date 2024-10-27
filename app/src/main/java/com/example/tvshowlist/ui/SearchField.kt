@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tvshowlist.MainViewModel
+import com.example.tvshowlist.data.db.TvShowCheckerDao
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
@@ -91,8 +92,8 @@ fun SearchField(
                             ItemTvShow(
                                 tvShow = tvShow,
                                 tvShowTitle = tvShow.title,
-                                tvShowTagLine = tvShow.description,
-                                tvShowAirDate = tvShow.airDate,
+                                tvShowTagLine = tvShow.description ?: "No Description Found",
+                                tvShowAirDate = tvShow.airDate ?: "N/A",
                                 imageUrl = RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath,
                                 modifier = Modifier.wrapContentSize(),
                                 navigateTo = navigateTo
@@ -103,10 +104,4 @@ fun SearchField(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun PreviewSearchField() {
-    SearchField(viewModel = MainViewModel(SearchTVShowsRepository()), navigateTo = {})
 }
