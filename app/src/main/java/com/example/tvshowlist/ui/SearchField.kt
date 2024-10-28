@@ -90,7 +90,7 @@ fun SearchField(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(vertical = 16.dp)
                     ) {
                         items(
                             if (searchText.isNotEmpty()) tvShowList else recentTvShowList) { tvShow ->

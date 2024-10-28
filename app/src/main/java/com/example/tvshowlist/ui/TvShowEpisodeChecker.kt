@@ -30,10 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.R
-import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
 import com.example.tvshowlist.ui.items.ItemTvShowChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,10 +114,15 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 )
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 0.dp, top = 0.dp, bottom = 16.dp, end = 0.dp)
                 ) {
                     itemsIndexed(seasonEpisodes.value.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
-                        ItemTvShowChecker(tvShowSeasonEpisodes = seasonEpisode, viewModel = viewModel)
+                        ItemTvShowChecker(
+                            tvShowSeasonEpisodes = seasonEpisode,
+                            viewModel = viewModel
+                        )
                     }
                 }
             }
