@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,13 +47,18 @@ fun SearchField(
     val isSearching by viewModel.isSearching.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    LaunchedEffect(recentTvShowList) {
+        viewModel.getRecentTvShows()
+    }
+
     Scaffold(topBar = { TopAppBar(title = { Text(text = "TV Show App") }) }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TextField(value = searchText,
+            TextField(
+                value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Search Tv Show") },
@@ -87,9 +93,7 @@ fun SearchField(
                             .padding(16.dp)
                     ) {
                         items(
-                            if (searchText.isNotEmpty()) tvShowList
-                            else recentTvShowList
-                        ) {tvShow ->
+                            if (searchText.isNotEmpty()) tvShowList else recentTvShowList) { tvShow ->
                             ItemTvShow(
                                 tvShow = tvShow,
                                 tvShowTitle = tvShow.title,

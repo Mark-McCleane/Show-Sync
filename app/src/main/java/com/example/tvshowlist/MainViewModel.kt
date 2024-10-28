@@ -60,7 +60,9 @@ class MainViewModel(
             }
         }.onEach { _isSearching.update { false } }
         .stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5000), _tvShowList.value
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _tvShowList.value
         )
 
     private val _recentTvShowList = MutableStateFlow(listOf<TvShow>())
@@ -88,7 +90,7 @@ class MainViewModel(
         return tvShowList
     }
 
-    private suspend fun getRecentTvShows(){
+    suspend fun getRecentTvShows(){
         val duplicateRemoverSet = mutableSetOf<TvShow>()
         repository.getRecentTvShows().forEach {
             duplicateRemoverSet.add(it)
@@ -104,6 +106,7 @@ class MainViewModel(
 
     fun getTvShowById(tvShowId: Int) {
         viewModelScope.launch {
+            _searchText.update { "" }
             val apiResult = repository.getTVShowById(tvShowId)
             val result = AppMapper.mapGetTvShowByIdApiResultToTvShow(apiResult)
             _selectedTvShow.update { result }
