@@ -58,11 +58,13 @@ fun SearchField(
     }
 
     LaunchedEffect(error) {
-        snackbarHostState.showSnackbar(
-            message = error,
-            withDismissAction = true,
-            duration = SnackbarDuration.Indefinite
-        )
+        if (error.isNotEmpty()) {
+            snackbarHostState.showSnackbar(
+                message = error,
+                withDismissAction = true,
+                duration = SnackbarDuration.Indefinite
+            )
+        }
     }
 
     Scaffold(

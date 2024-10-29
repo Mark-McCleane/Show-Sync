@@ -62,7 +62,9 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     }
 
     LaunchedEffect(key1 = error) {
-        snackbarHostState.showSnackbar(error, withDismissAction = false, duration = SnackbarDuration.Indefinite)
+        if(error.isNotEmpty()){
+            snackbarHostState.showSnackbar(error, withDismissAction = true, duration = SnackbarDuration.Indefinite)
+        }
     }
 
     val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
