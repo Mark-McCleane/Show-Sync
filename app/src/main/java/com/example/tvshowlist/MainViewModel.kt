@@ -1,5 +1,7 @@
 package com.example.tvshowlist
 
+import android.util.Log
+import androidx.compose.material3.Snackbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -48,6 +50,9 @@ class MainViewModel(
     private val _selectedSeason = MutableStateFlow(listOf<TvShowSeasonEpisodes>())
     val selectedSeason = _selectedSeason.asStateFlow()
 
+    private val _error = MutableStateFlow("")
+    val error = _error.asStateFlow()
+
     private val _tvShowList = MutableStateFlow(listOf<TvShow>())
     val tvShowList = searchText
         .debounce(1_000L)
@@ -81,16 +86,20 @@ class MainViewModel(
 
     private suspend fun getTvShows(query: String = ""): List<TvShow> {
         val duplicateRemoverSet = mutableSetOf<Result>()
-        val temp = repository.getTVShows(query).results
-        temp.forEach {
-            duplicateRemoverSet.add(it)
+        try {
+            val temp = repository.getTVShows(query).results
+            temp.forEach {
+                duplicateRemoverSet.add(it)
+            }
+        } catch (e: Exception) {
+            _error.update { e.localizedMessage ?: "No error found" }
         }
         val tvShowList = AppMapper.mapGetTvShowsApiResultToTvShowList(duplicateRemoverSet.toList())
         _tvShowList.update { tvShowList }
         return tvShowList
     }
 
-    suspend fun getRecentTvShows(){
+    suspend fun getRecentTvShows() {
         val duplicateRemoverSet = mutableSetOf<TvShow>()
         repository.getRecentTvShows().forEach {
             duplicateRemoverSet.add(it)

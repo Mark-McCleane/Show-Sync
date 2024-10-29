@@ -17,6 +17,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -24,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -46,12 +50,30 @@ fun SearchField(
     val recentTvShowList by viewModel.recentTvShowList.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val error by viewModel.error.collectAsState()
 
     LaunchedEffect(recentTvShowList) {
         viewModel.getRecentTvShows()
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(text = "TV Show App") }) }) { innerPadding ->
+    LaunchedEffect(error) {
+        snackbarHostState.showSnackbar(
+            message = error,
+            withDismissAction = true,
+            duration = SnackbarDuration.Indefinite
+        )
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "TV Show App") })
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,7 +115,8 @@ fun SearchField(
                             .padding(vertical = 16.dp)
                     ) {
                         items(
-                            if (searchText.isNotEmpty()) tvShowList else recentTvShowList) { tvShow ->
+                            if (searchText.isNotEmpty()) tvShowList else recentTvShowList
+                        ) { tvShow ->
                             ItemTvShow(
                                 tvShow = tvShow,
                                 tvShowTitle = tvShow.title,
