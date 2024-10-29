@@ -102,7 +102,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                         shape = RoundedCornerShape(4.dp)
                     )
-                    .padding(16.dp), // Add inner padding
+                    .padding(16.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -111,14 +111,14 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 ) {
                     Text(
                         text = "Seasons",
-                        style = MaterialTheme.typography.bodyLarge, // Use bodyLarge for better readability
-                        color = MaterialTheme.colorScheme.onSurface, // Set text color
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Icon(
-                        imageVector = Icons.Filled.ArrowDropDown, // Use a Material Icon
+                        imageVector = Icons.Filled.ArrowDropDown,
                         contentDescription = "Dropdown Arrow",
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.54f) // Adjust tint
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.54f)
                     )
                 }
 
@@ -126,7 +126,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                     expanded = isSeasonsDropDownExpanded,
                     onDismissRequest = { isSeasonsDropDownExpanded = false },
                     modifier = Modifier
-                        .width(IntrinsicSize.Min) // Prevent dropdown from being too wide
+                        .width(IntrinsicSize.Min)
                 ) {
                     seasonList.forEachIndexed { index, seasonNumber ->
                         DropdownMenuItem(
@@ -137,7 +137,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                             text = {
                                 Text(
                                     text = "Season $seasonNumber",
-                                    style = MaterialTheme.typography.bodyMedium, // Adjust text style
+                                    style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center
                                 )
                             }
