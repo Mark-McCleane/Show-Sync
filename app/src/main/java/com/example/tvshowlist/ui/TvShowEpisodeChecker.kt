@@ -16,6 +16,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,6 +44,8 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     val tvShow = viewModel.selectedTvShow.collectAsState()
     val seasonEpisodes = viewModel.selectedSeason.collectAsState()
     val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val error by viewModel.error.collectAsState()
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
     }
@@ -56,6 +61,10 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
         viewModel.getTvShowSeasons(tvShowId, seasonSelected)
     }
 
+    LaunchedEffect(key1 = error) {
+        snackbarHostState.showSnackbar(error, withDismissAction = false, duration = SnackbarDuration.Indefinite)
+    }
+
     val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
 
     Scaffold(topBar = {
@@ -64,7 +73,11 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 text = tvShow.value?.title ?: ""
             )
         })
-    }) { innerPadding ->
+    },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize()
         ) {

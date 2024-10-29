@@ -1,7 +1,5 @@
 package com.example.tvshowlist
 
-import android.util.Log
-import androidx.compose.material3.Snackbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -115,23 +113,31 @@ class MainViewModel(
 
     fun getTvShowById(tvShowId: Int) {
         viewModelScope.launch {
-            _searchText.update { "" }
-            val apiResult = repository.getTVShowById(tvShowId)
-            val result = AppMapper.mapGetTvShowByIdApiResultToTvShow(apiResult)
-            _selectedTvShow.update { result }
+            try {
+                _searchText.update { "" }
+                val apiResult = repository.getTVShowById(tvShowId)
+                val result = AppMapper.mapGetTvShowByIdApiResultToTvShow(apiResult)
+                _selectedTvShow.update { result }
+            } catch (e: Exception) {
+                _error.update { e.localizedMessage ?: "No error found" }
+            }
         }
     }
 
     fun getTvShowSeasons(tvShowId: Int, seasonNumber: Int = 1) {
         viewModelScope.launch {
             _isEpisodesLoading.value = true
-            val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
-            val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
-            result.forEach {
-                it.isChecked = repository.getIsWatchedStatus(it.episodeId)
-                insertTvShowSeasonEpisodesToDB(it)
+            try {
+                val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
+                val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
+                result.forEach {
+                    it.isChecked = repository.getIsWatchedStatus(it.episodeId)
+                    insertTvShowSeasonEpisodesToDB(it)
+                }
+                _selectedSeason.update { result }
+            } catch (e: Exception) {
+                _error.update { e.localizedMessage ?: "No error found" }
             }
-            _selectedSeason.update { result }
             _isEpisodesLoading.value = false
         }
     }
