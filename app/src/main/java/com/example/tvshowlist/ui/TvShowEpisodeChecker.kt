@@ -1,19 +1,26 @@
 package com.example.tvshowlist.ui
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -31,11 +38,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
-import com.example.tvshowlist.R
 import com.example.tvshowlist.ui.items.ItemTvShowChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +67,12 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     }
 
     LaunchedEffect(key1 = error) {
-        if(error.isNotEmpty()){
-            snackbarHostState.showSnackbar(error, withDismissAction = true, duration = SnackbarDuration.Indefinite)
+        if (error.isNotEmpty()) {
+            snackbarHostState.showSnackbar(
+                error,
+                withDismissAction = true,
+                duration = SnackbarDuration.Indefinite
+            )
         }
     }
 
@@ -87,39 +96,52 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(innerPadding)
-                    .clickable(onClick = { isSeasonsDropDownExpanded = true }),
+                    .clickable { isSeasonsDropDownExpanded = true }
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(16.dp), // Add inner padding
             ) {
-                Text(
-                    text = "Seasons",
-                    textAlign = TextAlign.Center,
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .wrapContentSize()
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Seasons",
+                        style = MaterialTheme.typography.bodyLarge, // Use bodyLarge for better readability
+                        color = MaterialTheme.colorScheme.onSurface, // Set text color
+                    )
 
-                Image(
-                    painter = painterResource(id = R.drawable.tvseries_seasons_drop_down_24),
-                    contentDescription = "Tv Series Seasons Dropdown",
-                    modifier = Modifier.align(Alignment.Center)
-
-                )
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown, // Use a Material Icon
+                        contentDescription = "Dropdown Arrow",
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.54f) // Adjust tint
+                    )
+                }
 
                 DropdownMenu(
                     expanded = isSeasonsDropDownExpanded,
                     onDismissRequest = { isSeasonsDropDownExpanded = false },
-                    modifier = Modifier.wrapContentSize()
+                    modifier = Modifier
+                        .width(IntrinsicSize.Min) // Prevent dropdown from being too wide
                 ) {
                     seasonList.forEachIndexed { index, seasonNumber ->
-                        DropdownMenuItem(text = {
-                            Text(
-                                text = "Season $seasonNumber",
-                                textAlign = TextAlign.Center
-                            )
-                        }, onClick = {
-                            seasonSelected = seasonNumber
-                            isSeasonsDropDownExpanded = false
-                        })
+                        DropdownMenuItem(
+                            onClick = {
+                                seasonSelected = seasonNumber
+                                isSeasonsDropDownExpanded = false
+                            },
+                            text = {
+                                Text(
+                                    text = "Season $seasonNumber",
+                                    style = MaterialTheme.typography.bodyMedium, // Adjust text style
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
                     }
                 }
             }
