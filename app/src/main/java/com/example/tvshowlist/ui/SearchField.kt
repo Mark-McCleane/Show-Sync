@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +40,7 @@ import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.ui.items.ItemTvShow
+import com.example.tvshowlist.utils.ApplicationOnlineChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,15 +54,16 @@ fun SearchField(
     val isLoading by viewModel.isLoading.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val error by viewModel.error.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(recentTvShowList) {
         viewModel.getRecentTvShows()
     }
 
-    LaunchedEffect(error) {
+    LaunchedEffect(key1 = error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                message = error,
+                message = if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )

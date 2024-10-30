@@ -38,10 +38,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.ui.items.ItemTvShowChecker
+import com.example.tvshowlist.utils.ApplicationOnlineChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +53,8 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val error by viewModel.error.collectAsState()
+    val context = LocalContext.current
+
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
     }
@@ -69,7 +73,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     LaunchedEffect(key1 = error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                error,
+                if(!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
