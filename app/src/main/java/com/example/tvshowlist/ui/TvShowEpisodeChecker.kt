@@ -67,7 +67,11 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     }
 
     LaunchedEffect(key1 = seasonSelected) {
-        viewModel.getTvShowSeasons(tvShowId, seasonSelected)
+        if(ApplicationOnlineChecker.isOnline(context)){
+            viewModel.getTvShowSeasons(tvShowId, seasonSelected)
+        } else{
+            viewModel.getTvShowSeasonsOffline(tvShowId, seasonSelected)
+        }
     }
 
     LaunchedEffect(key1 = error) {

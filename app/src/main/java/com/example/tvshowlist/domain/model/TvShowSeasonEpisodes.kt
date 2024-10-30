@@ -13,5 +13,6 @@ data class TvShowSeasonEpisodes(
     val seasonNumber: Int,
     val voteAverage: Double = 0.0,
     val overview: String,
+    var tvShowId: Int? = null,
     var isChecked: Boolean? = null,
 )

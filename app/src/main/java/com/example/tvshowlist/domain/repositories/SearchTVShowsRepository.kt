@@ -29,4 +29,10 @@ class SearchTVShowsRepository(private val dao: TvShowCheckerDao) {
 
     suspend fun getIsWatchedStatus(episodeId: Int): Boolean =
         dao.getIsWatchedStatus(episodeId = episodeId)
+
+    suspend fun getTvShowSeasonOffline(
+        tvShowId: Int,
+        seasonSelected: Int
+    ): List<TvShowSeasonEpisodes> =
+        dao.getTvShowSeasonOffline(tvShowId = tvShowId, seasonSelected = seasonSelected)
 }

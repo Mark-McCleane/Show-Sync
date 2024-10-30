@@ -1,9 +1,5 @@
 package com.example.tvshowlist
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -136,9 +132,23 @@ class MainViewModel(
                 val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
                 result.forEach {
                     it.isChecked = repository.getIsWatchedStatus(it.episodeId)
+                    it.tvShowId = tvShowId
                     insertTvShowSeasonEpisodesToDB(it)
                 }
                 _selectedSeason.update { result }
+            } catch (e: Exception) {
+                _error.update { e.localizedMessage ?: "No error found" }
+            }
+            _isEpisodesLoading.value = false
+        }
+    }
+
+    fun getTvShowSeasonsOffline(tvShowId: Int, seasonSelected: Int) {
+        viewModelScope.launch {
+            _isEpisodesLoading.value = true
+            try {
+                val databaseResult = repository.getTvShowSeasonOffline(tvShowId, seasonSelected)
+                _selectedSeason.update { databaseResult }
             } catch (e: Exception) {
                 _error.update { e.localizedMessage ?: "No error found" }
             }
