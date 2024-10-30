@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
                         val args = backStackEntry.toRoute<TvShowCheckerScreenRoute>()
                         TvShowEpisodeChecker(
                             tvShowId = args.tvShowId,
+                            tvShowName = args.tvShowName,
                             viewModel = viewModel,
                         )
                     }
@@ -68,4 +69,4 @@ class MainActivity : ComponentActivity() {
 object SearchScreenRoute
 
 @Serializable
-data class TvShowCheckerScreenRoute(val tvShowId: Int, val name: String)
+data class TvShowCheckerScreenRoute(val tvShowId: Int, val tvShowName: String)

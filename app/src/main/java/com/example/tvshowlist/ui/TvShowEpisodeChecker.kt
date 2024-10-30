@@ -47,7 +47,7 @@ import com.example.tvshowlist.utils.ApplicationOnlineChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
+fun TvShowEpisodeChecker(tvShowId: Int, tvShowName: String, viewModel: MainViewModel) {
     val tvShow = viewModel.selectedTvShow.collectAsState()
     val seasonEpisodes = viewModel.selectedSeason.collectAsState()
     val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()
@@ -63,13 +63,15 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     }
 
     LaunchedEffect(key1 = tvShow) {
-        viewModel.getTvShowById(tvShowId)
+        if (ApplicationOnlineChecker.isOnline(context)) {
+            viewModel.getTvShowById(tvShowId)
+        }
     }
 
     LaunchedEffect(key1 = seasonSelected) {
-        if(ApplicationOnlineChecker.isOnline(context)){
+        if (ApplicationOnlineChecker.isOnline(context)) {
             viewModel.getTvShowSeasons(tvShowId, seasonSelected)
-        } else{
+        } else {
             viewModel.getTvShowSeasonsOffline(tvShowId, seasonSelected)
         }
     }
@@ -77,7 +79,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     LaunchedEffect(key1 = error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                if(!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
+                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
@@ -89,7 +91,7 @@ fun TvShowEpisodeChecker(tvShowId: Int, viewModel: MainViewModel) {
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
-                text = tvShow.value?.title ?: ""
+                text = tvShow.value?.title ?: tvShowName
             )
         })
     },
