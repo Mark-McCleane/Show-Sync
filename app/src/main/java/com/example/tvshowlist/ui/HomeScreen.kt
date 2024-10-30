@@ -44,7 +44,7 @@ import com.example.tvshowlist.utils.ApplicationOnlineChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchField(
+fun HomeScreen(
     viewModel: MainViewModel, navigateTo: (tvShow: TvShow) -> Unit
 ) {
     val searchText by viewModel.searchText.collectAsState()
