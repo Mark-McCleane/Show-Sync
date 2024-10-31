@@ -49,9 +49,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable<TvShowCheckerScreenRoute>(
-                        typeMap = mapOf(typeOf<TvShow>() to ParcelableType<TvShow>())
-                    ) { backStackEntry ->
+                    composable<TvShowCheckerScreenRoute> { backStackEntry ->
                         val args = backStackEntry.toRoute<TvShowCheckerScreenRoute>()
                         TvShowEpisodeChecker(
                             tvShowId = args.tvShowId,

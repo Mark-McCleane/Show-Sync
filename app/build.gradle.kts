@@ -2,8 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
-    id("kotlin-parcelize")
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -71,7 +70,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.retrofit2.retrofit)
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation (libs.converter.gson)
     //coil
     implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
@@ -85,13 +84,13 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     //Room
-    val room_version = "2.6.1"
+    val roomVersion = "2.6.1"
 
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
 
     // To use Kotlin Symbol Processing (KSP)
-    ksp("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$roomVersion")
     implementation("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")
     ksp("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")
     implementation("androidx.room:room-ktx:2.6.1")
