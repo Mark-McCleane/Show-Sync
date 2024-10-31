@@ -12,7 +12,7 @@ import androidx.navigation.toRoute
 import com.example.tvshowlist.data.db.TvShowCheckerDatabase
 import com.example.tvshowlist.domain.model.ParcelableType
 import com.example.tvshowlist.domain.model.TvShow
-import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
+import com.example.tvshowlist.domain.repositories.TvShowsRepository
 import com.example.tvshowlist.ui.HomeScreen
 import com.example.tvshowlist.ui.TvShowEpisodeChecker
 import com.example.tvshowlist.ui.theme.TvShowListTheme
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     TvShowCheckerDatabase.getDatabase(applicationContext).tvShowCheckerDao()
 
                 val viewModelProviderFactory =
-                    ViewModelProviderFactory(SearchTVShowsRepository(tvShowCheckerDao))
+                    ViewModelProviderFactory(TvShowsRepository(tvShowCheckerDao))
 
                 val viewModel =
                     ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]

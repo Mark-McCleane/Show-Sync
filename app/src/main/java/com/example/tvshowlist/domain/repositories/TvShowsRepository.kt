@@ -9,7 +9,7 @@ import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 
 
-class SearchTVShowsRepository(private val dao: TvShowCheckerDao) {
+class TvShowsRepository(private val dao: TvShowCheckerDao) {
     suspend fun getTVShows(query: String = ""): SearchApiResponse =
         RetrofitInstance.api.searchTvShowsByName(query = query)
 

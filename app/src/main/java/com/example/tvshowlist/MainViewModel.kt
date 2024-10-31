@@ -7,7 +7,7 @@ import com.example.tvshowlist.data.remote.AppMapper
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
-import com.example.tvshowlist.domain.repositories.SearchTVShowsRepository
+import com.example.tvshowlist.domain.repositories.TvShowsRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class MainViewModel(
-    private val repository: SearchTVShowsRepository
+    private val repository: TvShowsRepository
 ) : ViewModel() {
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
