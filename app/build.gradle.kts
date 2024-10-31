@@ -70,29 +70,22 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.retrofit2.retrofit)
-    implementation (libs.converter.gson)
+    implementation(libs.converter.gson)
     //coil
-    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     //gson
-    implementation (libs.gson)
+    implementation(libs.gson)
     //logging
-    implementation (libs.logging.interceptor)
+    implementation(libs.logging.interceptor)
 
     //compose navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
-    //Room
-    val roomVersion = "2.6.1"
-
-    implementation("androidx.room:room-runtime:$roomVersion")
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-
-    // To use Kotlin Symbol Processing (KSP)
-    ksp("androidx.room:room-compiler:$roomVersion")
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")
-    ksp("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")
-    implementation("androidx.room:room-ktx:2.6.1")
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
+    implementation(libs.ksp.api)
+    implementation(libs.room.ktx)
 
 }
