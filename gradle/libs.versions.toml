@@ -23,6 +23,7 @@ roomTesting = "2.6.1"
 serialization = "1.6.3"
 ksp = "1.9.0-1.0.13"
 roomVersion = "2.6.1"
+koinVersion = "3.5.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +57,10 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersi
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinVersion"}
+koin-androidx-compose = { module = "io.insert-koin:koin-android-compose", version.ref = "koinVersion"}
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinVersion"}
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinVersion"}
 
 
 [plugins]

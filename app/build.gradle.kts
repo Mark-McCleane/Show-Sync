@@ -88,4 +88,10 @@ dependencies {
     implementation(libs.ksp.api)
     implementation(libs.room.ktx)
 
+    //Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.core)
+    implementation(platform(libs.koin.bom))
+
 }
