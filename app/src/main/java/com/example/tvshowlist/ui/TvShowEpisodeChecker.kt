@@ -44,10 +44,15 @@ import androidx.compose.ui.unit.dp
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.ui.items.ItemTvShowChecker
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TvShowEpisodeChecker(tvShowId: Int, tvShowName: String, viewModel: MainViewModel) {
+fun TvShowEpisodeChecker(
+    tvShowId: Int,
+    tvShowName: String,
+    viewModel: MainViewModel
+) {
     val tvShow = viewModel.selectedTvShow.collectAsState()
     val seasonEpisodes = viewModel.selectedSeason.collectAsState()
     val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()

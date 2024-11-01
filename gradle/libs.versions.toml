@@ -58,7 +58,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinVersion"}
-koin-androidx-compose = { module = "io.insert-koin:koin-android-compose", version.ref = "koinVersion"}
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinVersion"}
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinVersion"}
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinVersion"}
 

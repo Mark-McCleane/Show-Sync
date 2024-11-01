@@ -41,11 +41,13 @@ import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.ui.items.ItemTvShow
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: MainViewModel, navigateTo: (tvShow: TvShow) -> Unit
+    viewModel: MainViewModel = koinViewModel(),
+    navigateTo: (tvShow: TvShow) -> Unit
 ) {
     val searchText by viewModel.searchText.collectAsState()
     val tvShowList by viewModel.tvShowList.collectAsState()

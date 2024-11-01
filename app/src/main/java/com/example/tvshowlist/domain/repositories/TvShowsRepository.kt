@@ -1,38 +1,22 @@
 package com.example.tvshowlist.domain.repositories
 
-import com.example.tvshowlist.data.db.TvShowCheckerDao
 import com.example.tvshowlist.data.entities.getTvShow.GetTvShowApiResponse
 import com.example.tvshowlist.data.entities.getTvShowSeason.GetSeasonApiResponse
 import com.example.tvshowlist.data.entities.search.SearchApiResponse
-import com.example.tvshowlist.data.remote.RetrofitInstance
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 
-
-class TvShowsRepository(private val dao: TvShowCheckerDao) {
-    suspend fun getTVShows(query: String = ""): SearchApiResponse =
-        RetrofitInstance.api.searchTvShowsByName(query = query)
-
-    suspend fun getTVShowById(tvShowId: Int): GetTvShowApiResponse =
-        RetrofitInstance.api.getTvShowById(id = tvShowId)
-
-    suspend fun getTvShowSeason(tvShowId: Int, seasonNumber: Int = 1): GetSeasonApiResponse =
-        RetrofitInstance.api.getSeasonById(tvId = tvShowId, seasonNumber = seasonNumber)
-
-    suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes) =
-        dao.upsertTvShowChecker(tvShowChecker = tvShow)
-
-    suspend fun insertRecentTvShow(tvShow: TvShow) = dao.insertRecentTvShow(tvShow = tvShow)
-    suspend fun getRecentTvShows(): List<TvShow> = dao.getRecentTvShows()
-    suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean) =
-        dao.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatchedStatus)
-
-    suspend fun getIsWatchedStatus(episodeId: Int): Boolean =
-        dao.getIsWatchedStatus(episodeId = episodeId)
-
+interface TvShowsRepository {
+    suspend fun getTVShows(query: String = ""): SearchApiResponse
+    suspend fun getTVShowById(tvShowId: Int): GetTvShowApiResponse
+    suspend fun getTvShowSeason(tvShowId: Int, seasonNumber: Int = 1): GetSeasonApiResponse
+    suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes)
+    suspend fun insertRecentTvShow(tvShow: TvShow)
+    suspend fun getRecentTvShows(): List<TvShow>
+    suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean)
+    suspend fun getIsWatchedStatus(episodeId: Int): Boolean
     suspend fun getTvShowSeasonOffline(
         tvShowId: Int,
         seasonSelected: Int
-    ): List<TvShowSeasonEpisodes> =
-        dao.getTvShowSeasonOffline(tvShowId = tvShowId, seasonSelected = seasonSelected)
+    ): List<TvShowSeasonEpisodes>
 }

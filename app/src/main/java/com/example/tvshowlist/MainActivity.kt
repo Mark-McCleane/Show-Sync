@@ -4,43 +4,52 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.tvshowlist.data.db.TvShowCheckerDatabase
-import com.example.tvshowlist.domain.model.ParcelableType
-import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
+import com.example.tvshowlist.domain.repositories.TvShowsRepositoryImpl
 import com.example.tvshowlist.ui.HomeScreen
 import com.example.tvshowlist.ui.TvShowEpisodeChecker
 import com.example.tvshowlist.ui.theme.TvShowListTheme
-import com.example.tvshowlist.utils.ViewModelProviderFactory
 import kotlinx.serialization.Serializable
-import kotlin.reflect.typeOf
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val module = module {
+            single<TvShowsRepository> { TvShowsRepositoryImpl(get()) }
+            viewModelOf(::MainViewModel)
+        }
+
+        val databaseModule = module {
+            single { TvShowCheckerDatabase.getDatabase(get()).tvShowCheckerDao() }
+        }
+
+        startKoin {
+            androidContext(this@MainActivity)
+            modules(module, databaseModule)
+        }
+
         setContent {
             TvShowListTheme {
-                val tvShowCheckerDao =
-                    TvShowCheckerDatabase.getDatabase(applicationContext).tvShowCheckerDao()
-
-                val viewModelProviderFactory =
-                    ViewModelProviderFactory(TvShowsRepository(tvShowCheckerDao))
-
-                val viewModel =
-                    ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
+                val viewModel: MainViewModel = koinViewModel()
 
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = SearchScreenRoute) {
                     composable<SearchScreenRoute> {
                         HomeScreen(
-                            viewModel = viewModel,
+                            viewModel = koinViewModel(),
                             navigateTo = {
                                 it.addedToRecentDate = System.currentTimeMillis()
                                 viewModel.insertRecentTvShow(it)
@@ -54,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         TvShowEpisodeChecker(
                             tvShowId = args.tvShowId,
                             tvShowName = args.tvShowName,
-                            viewModel = viewModel,
+                            viewModel = koinViewModel(),
                         )
                     }
                 }

@@ -31,13 +31,17 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.tvshowlist.MainViewModel
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 
 @Composable
-fun ItemTvShowChecker(tvShowSeasonEpisodes: TvShowSeasonEpisodes, viewModel: MainViewModel) {
+fun ItemTvShowChecker(
+    tvShowSeasonEpisodes: TvShowSeasonEpisodes,
+    viewModel: MainViewModel = koinViewModel()
+) {
     var isOverviewExpanded by remember { mutableStateOf(false) }
     var isWatched by remember {
         mutableStateOf(tvShowSeasonEpisodes.isChecked ?: false)
