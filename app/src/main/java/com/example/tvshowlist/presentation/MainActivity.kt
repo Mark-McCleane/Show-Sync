@@ -8,36 +8,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.tvshowlist.data.db.TvShowCheckerDatabase
-import com.example.tvshowlist.domain.repositories.TvShowsRepository
-import com.example.tvshowlist.domain.repositories.TvShowsRepositoryImpl
+import com.example.tvshowlist.di.AppModules
 import com.example.tvshowlist.presentation.ui.HomeScreen
 import com.example.tvshowlist.presentation.ui.TvShowEpisodeChecker
 import com.example.tvshowlist.presentation.ui.theme.TvShowListTheme
 import kotlinx.serialization.Serializable
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val module = module {
-            single<TvShowsRepository> { TvShowsRepositoryImpl(get()) }
-            viewModelOf(::MainViewModel)
-        }
-
-        val databaseModule = module {
-            single { TvShowCheckerDatabase.getDatabase(get()).tvShowCheckerDao() }
-        }
 
         startKoin {
             androidContext(this@MainActivity)
-            modules(module, databaseModule)
+            modules(AppModules.mainModule, AppModules.databaseModule)
         }
 
         setContent {
