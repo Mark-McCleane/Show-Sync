@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui.items
+package com.example.tvshowlist.presentation.ui.items
 
 import android.os.Build
 import androidx.compose.foundation.clickable
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.example.tvshowlist.MainViewModel
+import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -93,6 +93,7 @@ fun ItemTvShowChecker(
                     )
                     val rating =
                         String.format(Locale.getDefault(), "%.1f", tvShowSeasonEpisodes.voteAverage)
+
                     Text(
                         text = rating,
                         fontWeight = FontWeight.Bold,

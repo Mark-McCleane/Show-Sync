@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui.theme
+package com.example.tvshowlist.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

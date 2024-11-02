@@ -1,4 +1,4 @@
-package com.example.tvshowlist
+package com.example.tvshowlist.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,9 +11,9 @@ import androidx.navigation.toRoute
 import com.example.tvshowlist.data.db.TvShowCheckerDatabase
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
 import com.example.tvshowlist.domain.repositories.TvShowsRepositoryImpl
-import com.example.tvshowlist.ui.HomeScreen
-import com.example.tvshowlist.ui.TvShowEpisodeChecker
-import com.example.tvshowlist.ui.theme.TvShowListTheme
+import com.example.tvshowlist.presentation.ui.HomeScreen
+import com.example.tvshowlist.presentation.ui.TvShowEpisodeChecker
+import com.example.tvshowlist.presentation.ui.theme.TvShowListTheme
 import kotlinx.serialization.Serializable
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel

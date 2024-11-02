@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui.theme
+package com.example.tvshowlist.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui
+package com.example.tvshowlist.presentation.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,10 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.tvshowlist.MainViewModel
-import com.example.tvshowlist.ui.items.ItemTvShowChecker
+import com.example.tvshowlist.presentation.MainViewModel
+import com.example.tvshowlist.presentation.ui.items.ItemTvShowChecker
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

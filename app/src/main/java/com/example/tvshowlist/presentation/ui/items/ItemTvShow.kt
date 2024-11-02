@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui.items
+package com.example.tvshowlist.presentation.ui.items
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable

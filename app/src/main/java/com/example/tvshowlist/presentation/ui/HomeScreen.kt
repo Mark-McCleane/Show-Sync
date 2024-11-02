@@ -1,4 +1,4 @@
-package com.example.tvshowlist.ui
+package com.example.tvshowlist.presentation.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tvshowlist.MainViewModel
+import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
-import com.example.tvshowlist.ui.items.ItemTvShow
+import com.example.tvshowlist.presentation.ui.items.ItemTvShow
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import org.koin.androidx.compose.koinViewModel
 
