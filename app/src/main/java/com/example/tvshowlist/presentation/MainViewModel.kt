@@ -99,8 +99,10 @@ class MainViewModel(
 
     suspend fun getRecentTvShows() {
         val duplicateRemoverSet = mutableSetOf<TvShow>()
-        repository.getRecentTvShows().forEach {
-            duplicateRemoverSet.add(it)
+        repository.getRecentTvShows().collect { tvShowList ->
+            tvShowList.forEach {
+                duplicateRemoverSet.add(it)
+            }
         }
         _recentTvShowList.update { duplicateRemoverSet.toList() }
     }

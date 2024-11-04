@@ -8,10 +8,11 @@ import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -26,8 +27,7 @@ import org.koin.dsl.module
 
 @ExperimentalCoroutinesApi
 class MainViewModelTest {
-    private val repository: TvShowsRepository = mockk(relaxed = true)
-    private val viewModel: MainViewModel by lazy { MainViewModel(repository) }
+    private lateinit var viewModel: MainViewModel
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -38,8 +38,21 @@ class MainViewModelTest {
         viewModel { MainViewModel(get()) }
     }
 
+    private val tvShow1 = TvShow(
+        id = 1,
+        description = "Show 1",
+        title = "Description 1",
+        airDate = "https://example.com/show1.jpg"
+    )
+    private val tvShow2 = TvShow(
+        id = 2,
+        description = "Show 2",
+        title = "Description 2",
+        airDate = "https://example.com/show2.jpg"
+    )
+
     @ExperimentalCoroutinesApi
-    class MainDispatcherRule(val dispatcher: TestDispatcher = StandardTestDispatcher()) :
+    class MainDispatcherRule(private val dispatcher: TestDispatcher = StandardTestDispatcher()) :
         TestWatcher() {
         override fun starting(description: Description?) = Dispatchers.setMain(dispatcher)
 
@@ -59,24 +72,22 @@ class MainViewModelTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun `tests getRecentTvShows() returns list of recent tv shows`() = runBlocking {
+    fun `tests getRecentTvShows() returns list of recent tv shows`() = runTest {
         val repository: TvShowsRepository = mockk()
-        val tvShow1 = TvShow(
-            id = 1,
-            description = "Show 1",
-            title = "Description 1",
-            airDate = "https://example.com/show1.jpg"
-        )
-        val tvShow2 = TvShow(
-            id = 2,
-            description = "Show 2",
-            title = "Description 2",
-            airDate = "https://example.com/show2.jpg"
-        )
 
-        coEvery { repository.getRecentTvShows() } returns listOf(tvShow1, tvShow2)
+        coEvery { repository.getRecentTvShows() } returns flowOf(
+            listOf(
+                tvShow1,
+                tvShow2,
+                tvShow1,
+                tvShow2
+            )
+        )
+        viewModel = MainViewModel(repository)
         viewModel.getRecentTvShows()
+
         val expectedList = listOf(tvShow1, tvShow2)
-        assertEquals(expectedList, viewModel.recentTvShowList.value)
+        val actualTvShows = viewModel.recentTvShowList.value
+        assertEquals(expectedList, actualTvShows)
     }
 }

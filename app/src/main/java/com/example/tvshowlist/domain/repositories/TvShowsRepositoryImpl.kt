@@ -7,6 +7,8 @@ import com.example.tvshowlist.data.entities.search.SearchApiResponse
 import com.example.tvshowlist.data.remote.RetrofitInstance
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 
 class TvShowsRepositoryImpl(private val dao: TvShowCheckerDao): TvShowsRepository {
@@ -23,7 +25,7 @@ class TvShowsRepositoryImpl(private val dao: TvShowCheckerDao): TvShowsRepositor
         dao.upsertTvShowChecker(tvShowChecker = tvShow)
 
     override suspend fun insertRecentTvShow(tvShow: TvShow) = dao.insertRecentTvShow(tvShow = tvShow)
-    override suspend fun getRecentTvShows(): List<TvShow> = dao.getRecentTvShows()
+    override suspend fun getRecentTvShows(): Flow<List<TvShow>> = flowOf(dao.getRecentTvShows())
     override suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean) =
         dao.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatchedStatus)
 
