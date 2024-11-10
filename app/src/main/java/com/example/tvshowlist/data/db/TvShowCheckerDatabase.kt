@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 
-@Database(entities = [TvShow::class, TvShowSeasonEpisodes::class], version = 1, exportSchema = false)
+@Database(entities = [TvShow::class, TvShowSeasonEpisodes::class], version = 2, exportSchema = false)
 abstract class TvShowCheckerDatabase : RoomDatabase() {
     abstract fun tvShowCheckerDao(): TvShowCheckerDao
 
@@ -25,7 +25,9 @@ abstract class TvShowCheckerDatabase : RoomDatabase() {
                     context.applicationContext,
                     TvShowCheckerDatabase::class.java,
                     "tv_show_checker_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 return instance
             }
         }
