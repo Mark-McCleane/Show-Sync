@@ -23,10 +23,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        startKoin {
-            androidContext(this@MainActivity)
-            modules(AppModules.mainModule, AppModules.databaseModule)
-        }
+//        startKoin {
+//            androidContext(this@MainActivity)
+//            modules(AppModules.mainModule, AppModules.databaseModule)
+//        }
 
         setContent {
             TvShowListTheme {
