@@ -83,6 +83,7 @@ fun TvShowEpisodeChecker(
     }
 
     val currentSeasonEpisodes = seasonEpisodes.filter { it.seasonNumber == seasonSelected }
+
     val allChecked = currentSeasonEpisodes.isNotEmpty() &&
             currentSeasonEpisodes.all { it.isChecked == true }
 
@@ -195,86 +196,107 @@ fun TvShowEpisodeChecker(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             } else {
-                if (currentSeasonEpisodes.size > 1) {
-                    ListItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        headlineContent = {
-                            Text(stringResource(R.string.check_all), modifier = Modifier)
-                        },
-                        trailingContent = {
-                            Checkbox(
-                                checked = checkedAll,
-                                modifier = Modifier,
-                                onCheckedChange = { isChecked ->
-                                    currentSeasonEpisodes.forEach { episode ->
-                                        viewModel.updateIsWatchedState(
-                                            episodeId = episode.episodeId,
-                                            isWatched = isChecked
-                                        )
-                                    }
-                                })
-                        }
-                    )
+                if (currentSeasonEpisodes.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 32.dp, top = 16.dp, bottom = 16.dp, end = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Text(
+                            text = "No episodes found for this season",
+                            style = MaterialTheme.typography.displaySmall
+                        )
+                    }
+                } else if (currentSeasonEpisodes.size >= 2) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp)
+                    ) {
+                        Divider()
+                        ListItem(
+                            modifier = Modifier,
+                            headlineContent = {
+                                Text(stringResource(R.string.check_all), modifier = Modifier)
+                            },
+                            trailingContent = {
+                                Checkbox(
+                                    checked = checkedAll,
+                                    modifier = Modifier,
+                                    onCheckedChange = { isChecked ->
+                                        currentSeasonEpisodes.forEach { episode ->
+                                            viewModel.updateIsWatchedState(
+                                                episodeId = episode.episodeId,
+                                                isWatched = isChecked
+                                            )
+                                        }
+                                    })
+                            }
+                        )
+                        Divider()
+                    }
                 }
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 0.dp, top = 0.dp, bottom = 16.dp, end = 0.dp)
-            ) {
-                itemsIndexed(seasonEpisodes.filter { it.seasonNumber == seasonSelected }) { index, seasonEpisode ->
-                    var isExpanded by remember { mutableStateOf(false) }
-                    val isWatched = seasonEpisode.isChecked ?: false
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 0.dp, top = 0.dp, bottom = 16.dp, end = 0.dp)
+                ) {
+                    itemsIndexed(currentSeasonEpisodes) { index, seasonEpisode ->
+                        var isExpanded by remember { mutableStateOf(false) }
+                        val isWatched = seasonEpisode.isChecked ?: false
 
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}",
-                                modifier = Modifier.padding(bottom = 5.dp)
-                            )
-                            RatingSection(tvShowSeasonEpisodes = seasonEpisode)
-                        },
-                        supportingContent = {
-                            Text(
-                                text = seasonEpisode.overview,
-                                modifier = Modifier.clickable { isExpanded = !isExpanded },
-                                maxLines = if (isExpanded) Int.MAX_VALUE else 3
-                            )
-                        },
-                        overlineContent = {
-                        },
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    text = "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}",
+                                    modifier = Modifier.padding(bottom = 5.dp)
+                                )
+                                RatingSection(tvShowSeasonEpisodes = seasonEpisode)
+                            },
+                            supportingContent = {
+                                Text(
+                                    text = seasonEpisode.overview,
+                                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                                    maxLines = if (isExpanded) Int.MAX_VALUE else 3
+                                )
+                            },
+                            overlineContent = {
+                            },
 
-                        leadingContent = {
-                            AsyncImage(
-                                model = seasonEpisode.episodeImage,
-                                error = painterResource(id = android.R.drawable.stat_notify_error),
-                                contentDescription = "${seasonEpisode.episodeName} Episode Image",
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.size(100.dp)
-                            )
-                        },
-                        trailingContent = {
-                            Checkbox(
-                                checked = isWatched,
-                                onCheckedChange = {
-                                    val newWatchedState = !isWatched
-                                    viewModel.updateIsWatchedState(
-                                        episodeId = seasonEpisode.episodeId,
-                                        isWatched = newWatchedState
-                                    )
-                                },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        },
-                        modifier = Modifier.clickable {
-                            val newWatchedState = !isWatched
-                            viewModel.updateIsWatchedState(
-                                episodeId = seasonEpisode.episodeId,
-                                isWatched = newWatchedState
-                            )
-                        }
-                    )
-                    Divider()
+                            leadingContent = {
+                                AsyncImage(
+                                    model = seasonEpisode.episodeImage,
+                                    error = painterResource(id = android.R.drawable.stat_notify_error),
+                                    contentDescription = "${seasonEpisode.episodeName} Episode Image",
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.size(100.dp)
+                                )
+                            },
+                            trailingContent = {
+                                Checkbox(
+                                    checked = isWatched,
+                                    onCheckedChange = {
+                                        val newWatchedState = !isWatched
+                                        viewModel.updateIsWatchedState(
+                                            episodeId = seasonEpisode.episodeId,
+                                            isWatched = newWatchedState
+                                        )
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                val newWatchedState = !isWatched
+                                viewModel.updateIsWatchedState(
+                                    episodeId = seasonEpisode.episodeId,
+                                    isWatched = newWatchedState
+                                )
+                            }
+                        )
+                        Divider()
+                    }
                 }
             }
         }

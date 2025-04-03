@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -92,11 +93,20 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Search Tv Show") },
                 trailingIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search Tv Shows"
-                        )
+                    if (searchText.isEmpty()) {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search Tv Shows"
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { viewModel.onSearchTextChange("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear Search Tv Shows"
+                            )
+                        }
                     }
                 })
 
