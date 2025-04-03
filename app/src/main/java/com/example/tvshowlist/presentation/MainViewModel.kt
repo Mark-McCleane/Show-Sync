@@ -166,7 +166,17 @@ class MainViewModel(
 
     fun updateIsWatchedState(episodeId: Int, isWatched: Boolean) {
         viewModelScope.launch {
-            repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
+            try {
+                repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
+                val currentTvShowId = selectedTvShow.value?.tvShowId
+                val currentSeason = _selectedSeason.value.firstOrNull()?.seasonNumber
+
+                if(currentTvShowId != null && currentSeason != null) {
+                    getTvShowSeasons(currentTvShowId, currentSeason)
+                }
+            } catch (e: Exception) {
+                _error.value = "Failed to update episode status: ${e.message}"
+            }
         }
     }
 }
