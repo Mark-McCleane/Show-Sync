@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,7 +67,10 @@ fun ItemTvShow(
             Column(modifier = Modifier) {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = "$tvShowTitle Cover Image",
+                    contentDescription = stringResource(
+                        com.example.tvshowlist.R.string.tvShowTitle_cover_image,
+                        tvShowTitle
+                    ),
                     error = painterResource(id = R.drawable.stat_notify_error),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.size(110.dp, 110.dp)
@@ -75,7 +79,7 @@ fun ItemTvShow(
             Spacer(modifier = Modifier.width(8.dp))
             val clickableModifier = Modifier.clickable { isExpanded = !isExpanded }
             Column(
-                modifier = Modifier.fillMaxWidth(0.75f)
+                modifier = Modifier.fillMaxWidth(0.85f)
             ) {
                 Text(
                     text = tvShowTitle,
@@ -85,14 +89,17 @@ fun ItemTvShow(
                 )
                 Divider(thickness = 2.dp)
                 Text(
-                    text = tvShowTagLine.ifEmpty { "No description found" },
+                    text = tvShowTagLine.ifEmpty { stringResource(com.example.tvshowlist.R.string.no_description_found) },
                     overflow = TextOverflow.Ellipsis,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 2,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Aired: $tvShowAirDate",
+                    text = stringResource(
+                        com.example.tvshowlist.R.string.aired_tvShowAirDate,
+                        tvShowAirDate
+                    ),
                     modifier = modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
