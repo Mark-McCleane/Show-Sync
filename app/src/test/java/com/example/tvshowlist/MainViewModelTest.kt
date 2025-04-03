@@ -72,7 +72,7 @@ class MainViewModelTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun `tests getRecentTvShows() returns list of recent tv shows`() = runTest {
+    fun `tests getRecentTvShows() returns list of recent tv shows without duplicates`() = runTest {
         val repository: TvShowsRepository = mockk()
 
         coEvery { repository.getRecentTvShows() } returns flowOf(
