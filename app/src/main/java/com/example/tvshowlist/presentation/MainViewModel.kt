@@ -8,6 +8,7 @@ import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
+import com.example.tvshowlist.presentation.ui.EpisodeCheckerUIState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +25,10 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val repository: TvShowsRepository
 ) : ViewModel() {
+
+    private val _episodeCheckerUIState = MutableStateFlow(EpisodeCheckerUIState())
+    val episodeCheckerUIState = _episodeCheckerUIState.asStateFlow()
+
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
@@ -38,15 +43,6 @@ class MainViewModel(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-
-    private val _isEpisodesLoading = MutableStateFlow(false)
-    val isEpisodesLoading = _isEpisodesLoading.asStateFlow()
-
-    private val _selectedTvShow = MutableStateFlow<TvShowExtended?>(null)
-    val selectedTvShow = _selectedTvShow.asStateFlow()
-
-    private val _selectedSeason = MutableStateFlow(listOf<TvShowSeasonEpisodes>())
-    val selectedSeason = _selectedSeason.asStateFlow()
 
     private val _error = MutableStateFlow("")
     val error = _error.asStateFlow()
@@ -119,7 +115,7 @@ class MainViewModel(
                 _searchText.update { "" }
                 val apiResult = repository.getTVShowById(tvShowId)
                 val result = AppMapper.mapGetTvShowByIdApiResultToTvShow(apiResult)
-                _selectedTvShow.update { result }
+                _episodeCheckerUIState.update { state -> state.copy(tvShow = result) }
             } catch (e: Exception) {
                 _error.update { e.localizedMessage ?: "No error found" }
             }
@@ -128,7 +124,7 @@ class MainViewModel(
 
     fun getTvShowSeasons(tvShowId: Int, seasonNumber: Int = 1) {
         viewModelScope.launch {
-            _isEpisodesLoading.value = true
+            _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = true) }
             try {
                 val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
                 val result = AppMapper.mapGetTvShowSeasonsApiResultToTvShowSeason(apiResult)
@@ -137,24 +133,24 @@ class MainViewModel(
                     it.tvShowId = tvShowId
                     insertTvShowSeasonEpisodesToDB(it)
                 }
-                _selectedSeason.update { result }
+                _episodeCheckerUIState.update { state -> state.copy(seasonEpisodes = result) }
             } catch (e: Exception) {
                 _error.update { e.localizedMessage ?: "No error found" }
             }
-            _isEpisodesLoading.value = false
+            _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = false) }
         }
     }
 
     fun getTvShowSeasonsOffline(tvShowId: Int, seasonSelected: Int) {
         viewModelScope.launch {
-            _isEpisodesLoading.value = true
+            _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = true) }
             try {
                 val databaseResult = repository.getTvShowSeasonOffline(tvShowId, seasonSelected)
-                _selectedSeason.update { databaseResult }
+                _episodeCheckerUIState.update { state -> state.copy(seasonEpisodes = databaseResult) }
             } catch (e: Exception) {
                 _error.update { e.localizedMessage ?: "No error found" }
             }
-            _isEpisodesLoading.value = false
+            _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = false) }
         }
     }
 
@@ -168,10 +164,11 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
-                val currentTvShowId = selectedTvShow.value?.tvShowId
-                val currentSeason = _selectedSeason.value.firstOrNull()?.seasonNumber
+                val currentTvShowId = episodeCheckerUIState.value.tvShow?.tvShowId
+                val currentSeason =
+                    _episodeCheckerUIState.value.seasonEpisodes.firstOrNull()?.seasonNumber
 
-                if(currentTvShowId != null && currentSeason != null) {
+                if (currentTvShowId != null && currentSeason != null) {
                     getTvShowSeasons(currentTvShowId, currentSeason)
                 }
             } catch (e: Exception) {

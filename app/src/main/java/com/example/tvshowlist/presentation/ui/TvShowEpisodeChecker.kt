@@ -68,11 +68,8 @@ fun TvShowEpisodeChecker(
     tvShowName: String,
     viewModel: MainViewModel
 ) {
-    val tvShow = viewModel.selectedTvShow.collectAsState()
-    val seasonEpisodes by viewModel.selectedSeason.collectAsState()
-    val isEpisodesLoaded by viewModel.isEpisodesLoading.collectAsState()
+    val state by viewModel.episodeCheckerUIState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val error by viewModel.error.collectAsState()
     val context = LocalContext.current
 
     var isSeasonsDropDownExpanded by remember {
@@ -82,7 +79,7 @@ fun TvShowEpisodeChecker(
         mutableIntStateOf(1)
     }
 
-    val currentSeasonEpisodes = seasonEpisodes.filter { it.seasonNumber == seasonSelected }
+    val currentSeasonEpisodes = state.seasonEpisodes.filter { it.seasonNumber == seasonSelected }
 
     val allChecked = currentSeasonEpisodes.isNotEmpty() &&
             currentSeasonEpisodes.all { it.isChecked == true }
@@ -97,7 +94,7 @@ fun TvShowEpisodeChecker(
                 currentSeasonEpisodes.all { it.isChecked == true }
     }
 
-    LaunchedEffect(key1 = tvShow) {
+    LaunchedEffect(key1 = state.tvShow) {
         if (ApplicationOnlineChecker.isOnline(context)) {
             viewModel.getTvShowById(tvShowId)
         }
@@ -111,23 +108,23 @@ fun TvShowEpisodeChecker(
         }
     }
 
-    LaunchedEffect(key1 = error) {
-        if (error.isNotEmpty()) {
+    LaunchedEffect(key1 = state.error) {
+        if (state.error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
+                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else state.error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
         }
     }
 
-    val seasonList = (1..(tvShow.value?.seasonCount ?: 1)).toList()
+    val seasonList = (1..(state.tvShow?.seasonCount ?: 1)).toList()
 
     Scaffold(
         topBar = {
             TopAppBar(title = {
                 Text(
-                    text = tvShow.value?.title ?: tvShowName
+                    text = state.tvShow?.title ?: tvShowName
                 )
             })
         },
@@ -191,7 +188,7 @@ fun TvShowEpisodeChecker(
                     }
                 }
             }
-            if (isEpisodesLoaded) {
+            if (state.isEpisodesLoaded) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -212,6 +209,15 @@ fun TvShowEpisodeChecker(
                 } else if (currentSeasonEpisodes.size >= 2) {
                     Column(
                         modifier = Modifier
+                            .clickable {
+                                val newChecked = !checkedAll
+                                currentSeasonEpisodes.forEach { episode ->
+                                    viewModel.updateIsWatchedState(
+                                        episodeId = episode.episodeId,
+                                        isWatched = newChecked
+                                    )
+                                }
+                            }
                             .fillMaxWidth()
                             .padding(0.dp)
                     ) {
@@ -225,14 +231,8 @@ fun TvShowEpisodeChecker(
                                 Checkbox(
                                     checked = checkedAll,
                                     modifier = Modifier,
-                                    onCheckedChange = { isChecked ->
-                                        currentSeasonEpisodes.forEach { episode ->
-                                            viewModel.updateIsWatchedState(
-                                                episodeId = episode.episodeId,
-                                                isWatched = isChecked
-                                            )
-                                        }
-                                    })
+                                    onCheckedChange = null
+                                )
                             }
                         )
                         Divider()
@@ -277,13 +277,7 @@ fun TvShowEpisodeChecker(
                             trailingContent = {
                                 Checkbox(
                                     checked = isWatched,
-                                    onCheckedChange = {
-                                        val newWatchedState = !isWatched
-                                        viewModel.updateIsWatchedState(
-                                            episodeId = seasonEpisode.episodeId,
-                                            isWatched = newWatchedState
-                                        )
-                                    },
+                                    onCheckedChange = null,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             },
