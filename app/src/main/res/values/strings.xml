@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TvShowList</string>
+    <string name="app_name">Show Sync</string>
     <string name="aired_tvShowAirDate">Aired: %1$s</string>
     <string name="no_description_found">No description found</string>
     <string name="tvShowTitle_cover_image">%1$s Cover Image</string>
