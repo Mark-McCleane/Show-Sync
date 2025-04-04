@@ -36,6 +36,9 @@ class TvShowsRepositoryImpl(private val dao: TvShowCheckerDao) : TvShowsReposito
     override suspend fun getIsWatchedStatus(episodeId: Int): Boolean =
         dao.getIsWatchedStatus(episodeId = episodeId)
 
+    override suspend fun getTop10TvShowEpisodesById(tvShowId: Int): List<TvShowSeasonEpisodes> =
+        dao.getTop10TvShowById(tvShowId = tvShowId)
+
     override suspend fun getTvShowSeasonOffline(
         tvShowId: Int,
         seasonSelected: Int

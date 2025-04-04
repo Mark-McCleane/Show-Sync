@@ -32,11 +32,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tvshowlist.R
 import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
@@ -91,20 +93,20 @@ fun HomeScreen(
                 value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "Search Tv Show") },
+                placeholder = { Text(text = stringResource(R.string.search_tv_show)) },
                 trailingIcon = {
                     if (searchText.isEmpty()) {
                         IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Search Tv Shows"
+                                contentDescription = stringResource(R.string.search_tv_show)
                             )
                         }
                     } else {
                         IconButton(onClick = { viewModel.onSearchTextChange("") }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear Search Tv Shows"
+                                contentDescription = stringResource(R.string.clear_search_tv_shows)
                             )
                         }
                     }

@@ -11,6 +11,7 @@ interface TvShowsRepository {
     suspend fun getTVShows(query: String = ""): SearchApiResponse
     suspend fun getTVShowById(tvShowId: Int): GetTvShowApiResponse
     suspend fun getTvShowSeason(tvShowId: Int, seasonNumber: Int = 1): GetSeasonApiResponse
+    suspend fun getTop10TvShowEpisodesById(tvShowId: Int): List<TvShowSeasonEpisodes>
     suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes)
     suspend fun insertRecentTvShow(tvShow: TvShow)
     suspend fun getRecentTvShows(): Flow<List<TvShow>>

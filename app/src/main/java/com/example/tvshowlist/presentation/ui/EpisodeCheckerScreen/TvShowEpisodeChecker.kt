@@ -1,4 +1,4 @@
-package com.example.tvshowlist.presentation.ui
+package com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen
 
 import android.os.Build
 import androidx.compose.foundation.border
@@ -79,7 +79,12 @@ fun TvShowEpisodeChecker(
         mutableIntStateOf(1)
     }
 
-    val currentSeasonEpisodes = state.seasonEpisodes.filter { it.seasonNumber == seasonSelected }
+    val currentSeasonEpisodes = if (seasonSelected > 0) {
+        state.seasonEpisodes.filter { it.seasonNumber == seasonSelected }
+    }
+    else {
+        state.top10Episodes
+    }
 
     val allChecked = currentSeasonEpisodes.isNotEmpty() &&
             currentSeasonEpisodes.all { it.isChecked == true }
@@ -106,6 +111,8 @@ fun TvShowEpisodeChecker(
         } else {
             viewModel.getTvShowSeasonsOffline(tvShowId, seasonSelected)
         }
+
+        viewModel.getTop10TvShowEpisodesById(tvShowId = tvShowId)
     }
 
     LaunchedEffect(key1 = state.error) {
@@ -153,7 +160,7 @@ fun TvShowEpisodeChecker(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Season $seasonSelected",
+                        text = if(seasonSelected > 0) "Season $seasonSelected" else stringResource(R.string.top_episodes),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -171,6 +178,19 @@ fun TvShowEpisodeChecker(
                     modifier = Modifier
                         .width(IntrinsicSize.Min)
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            seasonSelected = -1
+                            isSeasonsDropDownExpanded = false
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.top_episodes),
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    )
                     seasonList.forEachIndexed { index, seasonNumber ->
                         DropdownMenuItem(
                             onClick = {
@@ -250,7 +270,7 @@ fun TvShowEpisodeChecker(
                         ListItem(
                             headlineContent = {
                                 Text(
-                                    text = "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}",
+                                    text = if(seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}",
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
                                 RatingSection(tvShowSeasonEpisodes = seasonEpisode)

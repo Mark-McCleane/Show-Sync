@@ -22,6 +22,10 @@ interface TvShowCheckerDao {
 
     @Query("SELECT isChecked FROM tvShowSeasonEpisodesTable WHERE episodeId = :episodeId")
     suspend fun getIsWatchedStatus(episodeId: Int): Boolean
+
     @Query("SELECT * FROM tvShowSeasonEpisodesTable WHERE tvShowId = :tvShowId AND seasonNumber = :seasonSelected ORDER BY episodeNumber ASC")
     suspend fun getTvShowSeasonOffline(tvShowId: Int, seasonSelected: Int) : List<TvShowSeasonEpisodes>
+
+    @Query("SELECT * FROM tvShowSeasonEpisodesTable WHERE tvShowId = :tvShowId ORDER BY voteAverage  Desc LIMIT 10")
+    suspend fun getTop10TvShowById(tvShowId: Int): List<TvShowSeasonEpisodes>
 }

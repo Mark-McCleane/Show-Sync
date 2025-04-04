@@ -8,14 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.tvshowlist.di.AppModules
 import com.example.tvshowlist.presentation.ui.HomeScreen
-import com.example.tvshowlist.presentation.ui.TvShowEpisodeChecker
+import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.TvShowEpisodeChecker
 import com.example.tvshowlist.presentation.ui.theme.TvShowListTheme
 import kotlinx.serialization.Serializable
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.context.startKoin
 
 
 class MainActivity : ComponentActivity() {

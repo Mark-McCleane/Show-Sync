@@ -4,4 +4,7 @@
     <string name="no_description_found">No description found</string>
     <string name="tvShowTitle_cover_image">%1$s Cover Image</string>
     <string name="check_all">Check All</string>
+    <string name="search_tv_show">Search Tv Show</string>
+    <string name="clear_search_tv_shows">Clear Search Tv Shows</string>
+    <string name="top_episodes">Top Episodes</string>
 </resources>

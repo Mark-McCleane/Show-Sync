@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
 import com.example.tvshowlist.data.remote.AppMapper
 import com.example.tvshowlist.domain.model.TvShow
-import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
-import com.example.tvshowlist.presentation.ui.EpisodeCheckerUIState
+import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.EpisodeCheckerUIState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -151,6 +150,17 @@ class MainViewModel(
                 _error.update { e.localizedMessage ?: "No error found" }
             }
             _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = false) }
+        }
+    }
+
+    fun getTop10TvShowEpisodesById(tvShowId: Int){
+        viewModelScope.launch {
+            try {
+                val dbResult = repository.getTop10TvShowEpisodesById(tvShowId = tvShowId)
+                _episodeCheckerUIState.update { state -> state.copy(top10Episodes = dbResult) }
+            } catch (e: Exception){
+                _error.update { e.localizedMessage ?: "No error found" }
+            }
         }
     }
 
