@@ -81,8 +81,7 @@ fun TvShowEpisodeChecker(
 
     val currentSeasonEpisodes = if (seasonSelected > 0) {
         state.seasonEpisodes.filter { it.seasonNumber == seasonSelected }
-    }
-    else {
+    } else {
         state.top10Episodes
     }
 
@@ -160,7 +159,9 @@ fun TvShowEpisodeChecker(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if(seasonSelected > 0) "Season $seasonSelected" else stringResource(R.string.top_episodes),
+                        text = if (seasonSelected > 0) "Season $seasonSelected" else stringResource(
+                            R.string.top_episodes
+                        ),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -270,7 +271,7 @@ fun TvShowEpisodeChecker(
                         ListItem(
                             headlineContent = {
                                 Text(
-                                    text = if(seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}",
+                                    text = if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}",
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
                                 RatingSection(tvShowSeasonEpisodes = seasonEpisode)
