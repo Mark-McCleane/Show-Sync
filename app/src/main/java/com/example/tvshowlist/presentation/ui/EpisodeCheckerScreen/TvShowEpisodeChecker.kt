@@ -37,10 +37,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,9 +55,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.tvshowlist.R
+import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -66,9 +70,15 @@ import java.util.Locale
 fun TvShowEpisodeChecker(
     tvShowId: Int,
     tvShowName: String,
-    viewModel: MainViewModel
+    tvShow: TvShowExtended?,
+    seasonEpisodes: List<TvShowSeasonEpisodes>,
+    top10Episodes: List<TvShowSeasonEpisodes>,
+    isEpisodesLoaded: Boolean,
+    error: String,
+    onSeasonSelected: (Int) -> Unit,
+    onEpisodeWatchedToggle: (Int, Boolean) -> Unit,
+    onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean) -> Unit
 ) {
-    val state by viewModel.episodeCheckerUIState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -80,64 +90,46 @@ fun TvShowEpisodeChecker(
     }
 
     val currentSeasonEpisodes = if (seasonSelected > 0) {
-        state.seasonEpisodes.filter { it.seasonNumber == seasonSelected }
+        seasonEpisodes.filter { it.seasonNumber == seasonSelected }
     } else {
-        state.top10Episodes
+        top10Episodes
     }
 
-    val allChecked = currentSeasonEpisodes.isNotEmpty() &&
-            currentSeasonEpisodes.all { it.isChecked == true }
-
-
-    var checkedAll by remember(seasonSelected) {
-        mutableStateOf(allChecked)
-    }
-
-    LaunchedEffect(currentSeasonEpisodes.map { it.isChecked }) {
-        checkedAll = currentSeasonEpisodes.isNotEmpty() &&
-                currentSeasonEpisodes.all { it.isChecked == true }
-    }
-
-    LaunchedEffect(key1 = state.tvShow) {
-        if (ApplicationOnlineChecker.isOnline(context)) {
-            viewModel.getTvShowById(tvShowId)
+    val allChecked = remember(seasonSelected, currentSeasonEpisodes) {
+        derivedStateOf {
+            currentSeasonEpisodes.isNotEmpty() && currentSeasonEpisodes.all {
+                it.isChecked == true
+            }
         }
     }
+
+    val checkedAll by allChecked
 
     LaunchedEffect(key1 = seasonSelected) {
-        if (ApplicationOnlineChecker.isOnline(context)) {
-            viewModel.getTvShowSeasons(tvShowId, seasonSelected)
-        } else {
-            viewModel.getTvShowSeasonsOffline(tvShowId, seasonSelected)
-        }
-
-        viewModel.getTop10TvShowEpisodesById(tvShowId = tvShowId)
+        onSeasonSelected(seasonSelected)
     }
 
-    LaunchedEffect(key1 = state.error) {
-        if (state.error.isNotEmpty()) {
+    LaunchedEffect(key1 = error) {
+        if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else state.error,
+                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
         }
     }
 
-    val seasonList = (1..(state.tvShow?.seasonCount ?: 1)).toList()
+    val seasonList = (1..(tvShow?.seasonCount ?: 1)).toList()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = state.tvShow?.title ?: tvShowName
-                )
-            })
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                text = tvShow?.title ?: tvShowName
+            )
+        })
+    }, snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+    }) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -176,40 +168,33 @@ fun TvShowEpisodeChecker(
                 DropdownMenu(
                     expanded = isSeasonsDropDownExpanded,
                     onDismissRequest = { isSeasonsDropDownExpanded = false },
-                    modifier = Modifier
-                        .width(IntrinsicSize.Min)
+                    modifier = Modifier.width(IntrinsicSize.Min)
                 ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            seasonSelected = -1
+                    DropdownMenuItem(onClick = {
+                        seasonSelected = -1
+                        isSeasonsDropDownExpanded = false
+                    }, text = {
+                        Text(
+                            text = stringResource(R.string.top_episodes),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    })
+                    seasonList.forEachIndexed { index, seasonNumber ->
+                        DropdownMenuItem(onClick = {
+                            seasonSelected = seasonNumber
                             isSeasonsDropDownExpanded = false
-                        },
-                        text = {
+                        }, text = {
                             Text(
-                                text = stringResource(R.string.top_episodes),
+                                text = "Season $seasonNumber",
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
                             )
-                        }
-                    )
-                    seasonList.forEachIndexed { index, seasonNumber ->
-                        DropdownMenuItem(
-                            onClick = {
-                                seasonSelected = seasonNumber
-                                isSeasonsDropDownExpanded = false
-                            },
-                            text = {
-                                Text(
-                                    text = "Season $seasonNumber",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        )
+                        })
                     }
                 }
             }
-            if (state.isEpisodesLoaded) {
+            if (isEpisodesLoaded) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -232,30 +217,20 @@ fun TvShowEpisodeChecker(
                         modifier = Modifier
                             .clickable {
                                 val newChecked = !checkedAll
-                                currentSeasonEpisodes.forEach { episode ->
-                                    viewModel.updateIsWatchedState(
-                                        episodeId = episode.episodeId,
-                                        isWatched = newChecked
-                                    )
-                                }
+                                onCheckAllEpisodes(currentSeasonEpisodes, newChecked)
                             }
                             .fillMaxWidth()
-                            .padding(0.dp)
-                    ) {
+                            .padding(0.dp)) {
                         Divider()
-                        ListItem(
-                            modifier = Modifier,
-                            headlineContent = {
-                                Text(stringResource(R.string.check_all), modifier = Modifier)
-                            },
-                            trailingContent = {
-                                Checkbox(
-                                    checked = checkedAll,
-                                    modifier = Modifier,
-                                    onCheckedChange = null
-                                )
-                            }
-                        )
+                        ListItem(modifier = Modifier, headlineContent = {
+                            Text(stringResource(R.string.check_all), modifier = Modifier)
+                        }, trailingContent = {
+                            Checkbox(
+                                checked = checkedAll,
+                                modifier = Modifier,
+                                onCheckedChange = null
+                            )
+                        })
                         Divider()
                     }
                 }
@@ -266,7 +241,11 @@ fun TvShowEpisodeChecker(
                 ) {
                     itemsIndexed(currentSeasonEpisodes) { index, seasonEpisode ->
                         var isExpanded by remember { mutableStateOf(false) }
-                        val isWatched = seasonEpisode.isChecked ?: false
+                        var isWatched by rememberSaveable {
+                            mutableStateOf(
+                                seasonEpisode.isChecked ?: false
+                            )
+                        }
 
                         ListItem(
                             headlineContent = {
@@ -275,17 +254,13 @@ fun TvShowEpisodeChecker(
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
                                 RatingSection(tvShowSeasonEpisodes = seasonEpisode)
-                            },
-                            supportingContent = {
+                            }, supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
                                     modifier = Modifier.clickable { isExpanded = !isExpanded },
                                     maxLines = if (isExpanded) Int.MAX_VALUE else 3
                                 )
-                            },
-                            overlineContent = {
-                            },
-
+                            }, overlineContent = {},
                             leadingContent = {
                                 AsyncImage(
                                     model = seasonEpisode.episodeImage,
@@ -294,22 +269,17 @@ fun TvShowEpisodeChecker(
                                     contentScale = ContentScale.Fit,
                                     modifier = Modifier.size(100.dp)
                                 )
-                            },
-                            trailingContent = {
+                            }, trailingContent = {
                                 Checkbox(
                                     checked = isWatched,
                                     onCheckedChange = null,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
-                            },
-                            modifier = Modifier.clickable {
+                            }, modifier = Modifier.clickable {
                                 val newWatchedState = !isWatched
-                                viewModel.updateIsWatchedState(
-                                    episodeId = seasonEpisode.episodeId,
-                                    isWatched = newWatchedState
-                                )
-                            }
-                        )
+                                isWatched = newWatchedState
+                                onEpisodeWatchedToggle(seasonEpisode.episodeId, newWatchedState)
+                            })
                         Divider()
                     }
                 }
@@ -321,8 +291,7 @@ fun TvShowEpisodeChecker(
 @Composable
 private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End
     ) {
         Icon(
             imageVector = Icons.Default.Star,
@@ -330,8 +299,7 @@ private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
             tint = androidx.compose.ui.graphics.Color.Yellow,
             modifier = Modifier.weight(0.20f)
         )
-        val rating =
-            String.format(Locale.getDefault(), "%.1f", tvShowSeasonEpisodes.voteAverage)
+        val rating = String.format(Locale.getDefault(), "%.1f", tvShowSeasonEpisodes.voteAverage)
 
         Text(
             text = rating,
@@ -356,8 +324,7 @@ private fun formatDate(episodeAirDate: String): String {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return episodeAirDate
 
     val inputFormatter = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd",
-        Locale.getDefault()
+        "yyyy-MM-dd", Locale.getDefault()
     )
     val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
     return try {

@@ -1,5 +1,7 @@
 package com.example.tvshowlist.presentation
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -8,6 +10,7 @@ import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
 import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.EpisodeCheckerUIState
+import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -153,12 +156,12 @@ class MainViewModel(
         }
     }
 
-    fun getTop10TvShowEpisodesById(tvShowId: Int){
+    fun getTop10TvShowEpisodesById(tvShowId: Int) {
         viewModelScope.launch {
             try {
                 val dbResult = repository.getTop10TvShowEpisodesById(tvShowId = tvShowId)
                 _episodeCheckerUIState.update { state -> state.copy(top10Episodes = dbResult) }
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _error.update { e.localizedMessage ?: "No error found" }
             }
         }
@@ -174,12 +177,12 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
-                val currentTvShowId = episodeCheckerUIState.value.tvShow?.tvShowId
-                val currentSeason =
-                    _episodeCheckerUIState.value.seasonEpisodes.firstOrNull()?.seasonNumber
-
-                if (currentTvShowId != null && currentSeason != null) {
-                    getTvShowSeasons(currentTvShowId, currentSeason)
+                _episodeCheckerUIState.update { state ->
+                    state.seasonEpisodes.filter { it.episodeId == episodeId }.map {
+                        it.isChecked = isWatched
+                        it
+                    }
+                    state
                 }
             } catch (e: Exception) {
                 _error.value = "Failed to update episode status: ${e.message}"
