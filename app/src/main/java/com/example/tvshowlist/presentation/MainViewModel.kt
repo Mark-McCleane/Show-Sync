@@ -171,7 +171,23 @@ class MainViewModel(
         }
     }
 
-    fun updateIsWatchedState(episodeId: Int, isWatched: Boolean) {
+    private fun checkAllButtonChecker(seasonNumber: Int) {
+        val episodesInSeason = _episodeCheckerUIState.value.seasonEpisodes.filter { it.seasonNumber == seasonNumber }
+
+        // Handle empty list case
+        val allSameValue = episodesInSeason.isEmpty() ||
+                episodesInSeason.all { it.isChecked == true } ||
+                episodesInSeason.all { it.isChecked == false }
+
+        // Only update if the value is different from current state
+        if (_episodeCheckerUIState.value.checkedButton != allSameValue) {
+            _episodeCheckerUIState.update { state ->
+                state.copy(checkedButton = allSameValue)
+            }
+        }
+    }
+
+    fun updateIsWatchedState(episodeId: Int, isWatched: Boolean, seasonNumber: Int) {
         viewModelScope.launch {
             try {
                 repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
@@ -185,6 +201,7 @@ class MainViewModel(
                     }
                     state.copy(seasonEpisodes = updatedSeasonEpisodes)
                 }
+                checkAllButtonChecker(seasonNumber)
             } catch (e: Exception) {
                 _error.value = "Failed to update episode status: ${e.message}"
             }

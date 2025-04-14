@@ -76,9 +76,10 @@ fun TvShowEpisodeChecker(
     top10Episodes: List<TvShowSeasonEpisodes>,
     isEpisodesLoaded: Boolean,
     error: String,
+    checkedButton: Boolean,
     onSeasonSelected: (Int) -> Unit,
-    onEpisodeWatchedToggle: (Int, Boolean) -> Unit,
-    onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean) -> Unit
+    onEpisodeWatchedToggle: (Int, Boolean, Int) -> Unit,
+    onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean, Int) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -96,10 +97,9 @@ fun TvShowEpisodeChecker(
         top10Episodes
     }
 
-    var checkAll by rememberSaveable { mutableStateOf(
-        currentSeasonEpisodes.isNotEmpty() && currentSeasonEpisodes.all {
-            it.isChecked == true
-        }) }
+    var checkAll by remember {
+        mutableStateOf(checkedButton)
+    }
 
     LaunchedEffect(key1 = seasonSelected) {
         onSeasonSelected(seasonSelected)
@@ -212,7 +212,7 @@ fun TvShowEpisodeChecker(
                     Column(
                         modifier = Modifier
                             .clickable {
-                                onCheckAllEpisodes(currentSeasonEpisodes, !checkAll)
+                                onCheckAllEpisodes(currentSeasonEpisodes, !checkAll, seasonSelected)
                                 checkAll = !checkAll
                             }
                             .fillMaxWidth()
@@ -221,13 +221,8 @@ fun TvShowEpisodeChecker(
                         Divider()
                         ListItem(modifier = Modifier, headlineContent = {
                             Text(stringResource(R.string.check_all), modifier = Modifier)
-                        }, trailingContent = {
-                            Checkbox(
-                                checked = checkAll,
-                                modifier = Modifier,
-                                onCheckedChange = null
-                            )
-                        })
+                        }, trailingContent = {}
+                        )
                         Divider()
                     }
                 }
@@ -273,7 +268,7 @@ fun TvShowEpisodeChecker(
                                 )
                             }, modifier = Modifier.clickable {
                                 val newWatchedState = !(seasonEpisode.isChecked ?: false)
-                                onEpisodeWatchedToggle(seasonEpisode.episodeId, newWatchedState)
+                                onEpisodeWatchedToggle(seasonEpisode.episodeId, newWatchedState, seasonSelected)
                             })
                         Divider()
                     }

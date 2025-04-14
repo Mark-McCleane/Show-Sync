@@ -6,6 +6,7 @@ import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 data class EpisodeCheckerUIState(
     val tvShow: TvShowExtended? = null,
     val seasonEpisodes: List<TvShowSeasonEpisodes> = listOf(),
+    val checkedButton: Boolean = false,
     val isEpisodesLoaded: Boolean = false,
     val top10Episodes: List<TvShowSeasonEpisodes> = listOf(),
     val error: String = ""

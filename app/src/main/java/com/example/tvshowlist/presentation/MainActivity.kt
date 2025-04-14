@@ -64,6 +64,7 @@ class MainActivity : ComponentActivity() {
                             tvShowName = args.tvShowName,
                             tvShow = state.tvShow,
                             seasonEpisodes = state.seasonEpisodes,
+                            checkedButton = state.checkedButton,
                             top10Episodes = state.top10Episodes,
                             isEpisodesLoaded = state.isEpisodesLoaded,
                             error = state.error,
@@ -75,12 +76,12 @@ class MainActivity : ComponentActivity() {
                                 }
                                 viewModel.getTop10TvShowEpisodesById(tvShowId)
                             },
-                            onEpisodeWatchedToggle = { episodeId, isWatched ->
-                                viewModel.updateIsWatchedState(episodeId, isWatched)
+                            onEpisodeWatchedToggle = { episodeId, isWatched, seasonNumber ->
+                                viewModel.updateIsWatchedState(episodeId, isWatched, seasonNumber)
                             },
-                            onCheckAllEpisodes = { seasonEpisodes, isChecked ->
+                            onCheckAllEpisodes = { seasonEpisodes, isChecked, seasonNumber ->
                                 seasonEpisodes.forEach { episode ->
-                                    viewModel.updateIsWatchedState(episode.episodeId, isChecked)
+                                    viewModel.updateIsWatchedState(episode.episodeId, isChecked, seasonNumber)
                                 }
                             }
 
