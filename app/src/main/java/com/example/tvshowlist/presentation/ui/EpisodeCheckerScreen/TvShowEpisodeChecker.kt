@@ -105,7 +105,7 @@ fun TvShowEpisodeChecker(
     LaunchedEffect(key1 = error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
+                if (!ApplicationOnlineChecker.isOnline(context)) context.getString(R.string.no_internet_connection) else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
@@ -156,7 +156,7 @@ fun TvShowEpisodeChecker(
 
                     Icon(
                         imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "Dropdown Arrow",
+                        contentDescription = stringResource(R.string.dropdown_arrow),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.54f)
                     )
                 }
@@ -204,7 +204,7 @@ fun TvShowEpisodeChecker(
                         verticalArrangement = Arrangement.Top
                     ) {
                         Text(
-                            text = "No episodes found for this season",
+                            text = stringResource(R.string.no_episodes_found_for_this_season),
                             style = MaterialTheme.typography.displaySmall
                         )
                     }
@@ -253,10 +253,12 @@ fun TvShowEpisodeChecker(
                                 Text(
                                     text = seasonEpisode.overview,
                                     modifier = if (!isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
-                                        Modifier.clickable {
-                                            isExpanded = !isExpanded
-                                            isTextEnabled = !isTextEnabled
-                                        }.blur( 15.dp)
+                                        Modifier
+                                            .clickable {
+                                                isExpanded = !isExpanded
+                                                isTextEnabled = !isTextEnabled
+                                            }
+                                            .blur(15.dp)
                                     else Modifier.clickable {
                                             isExpanded = !isExpanded
                                             isTextEnabled = !isTextEnabled
@@ -319,7 +321,7 @@ private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
     ) {
         Icon(
             imageVector = Icons.Default.Star,
-            contentDescription = "Star Icon",
+            contentDescription = stringResource(R.string.star_icon),
             tint = androidx.compose.ui.graphics.Color.Yellow,
             modifier = Modifier.weight(0.20f)
         )

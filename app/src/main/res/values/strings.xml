@@ -10,4 +10,8 @@
     <string name="episode_image">%1$s Episode Image</string>
     <string name="season_selected_number">Season %1$s</string>
     <string name="season_no">Season %1$s</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="no_episodes_found_for_this_season">No episodes found for this season</string>
+    <string name="star_icon">Star Icon</string>
+    <string name="dropdown_arrow">Dropdown Arrow</string>
 </resources>
