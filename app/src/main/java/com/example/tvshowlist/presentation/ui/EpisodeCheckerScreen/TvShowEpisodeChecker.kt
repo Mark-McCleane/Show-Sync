@@ -144,7 +144,10 @@ fun TvShowEpisodeChecker(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (seasonSelected > 0) "Season $seasonSelected" else stringResource(
+                        text = if (seasonSelected > 0) stringResource(
+                            R.string.season_selected_number,
+                            seasonSelected
+                        ) else stringResource(
                             R.string.top_episodes
                         ),
                         style = MaterialTheme.typography.bodyLarge,
@@ -179,7 +182,7 @@ fun TvShowEpisodeChecker(
                             isSeasonsDropDownExpanded = false
                         }, text = {
                             Text(
-                                text = "Season $seasonNumber",
+                                text = stringResource(R.string.season_no, seasonNumber),
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -232,7 +235,12 @@ fun TvShowEpisodeChecker(
                         items = currentSeasonEpisodes,
                         key = { _, episode -> episode.episodeId }
                     ) { index, seasonEpisode ->
-                        var isExpanded by remember { mutableStateOf(false) }
+                        var isExpanded by rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
+                        var isTextEnabled by rememberSaveable(seasonEpisode.episodeId) {
+                            mutableStateOf(
+                                index == 0 || currentSeasonEpisodes[index - 1].isChecked || isExpanded
+                            )
+                        }
 
                         ListItem(
                             headlineContent = {
@@ -244,18 +252,28 @@ fun TvShowEpisodeChecker(
                             }, supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
-                                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                                    modifier = if (!isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
+                                        Modifier.clickable {
+                                            isExpanded = !isExpanded
+                                            isTextEnabled = !isTextEnabled
+                                        }.blur( 15.dp)
+                                    else Modifier.clickable {
+                                            isExpanded = !isExpanded
+                                            isTextEnabled = !isTextEnabled
+                                        },
                                     maxLines = if (isExpanded) Int.MAX_VALUE else 3
                                 )
                             }, overlineContent = {},
                             leadingContent = {
-                                val manuallyRevealed = rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
+                                val manuallyRevealed =
+                                    rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
 
-                                val blurValue = if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked) {
-                                    0.dp
-                                } else {
-                                    15.dp
-                                }
+                                val blurValue =
+                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked) {
+                                        0.dp
+                                    } else {
+                                        15.dp
+                                    }
 
                                 AsyncImage(
                                     model = seasonEpisode.episodeImage,

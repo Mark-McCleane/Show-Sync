@@ -8,4 +8,6 @@
     <string name="clear_search_tv_shows">Clear Search Tv Shows</string>
     <string name="top_episodes">Top Episodes</string>
     <string name="episode_image">%1$s Episode Image</string>
+    <string name="season_selected_number">Season %1$s</string>
+    <string name="season_no">Season %1$s</string>
 </resources>
