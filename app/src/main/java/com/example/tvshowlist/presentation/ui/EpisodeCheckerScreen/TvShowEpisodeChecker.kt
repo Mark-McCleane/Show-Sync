@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -95,15 +96,10 @@ fun TvShowEpisodeChecker(
         top10Episodes
     }
 
-    val allChecked = remember(seasonSelected, currentSeasonEpisodes) {
-        derivedStateOf {
-            currentSeasonEpisodes.isNotEmpty() && currentSeasonEpisodes.all {
-                it.isChecked == true
-            }
-        }
-    }
-
-    val checkedAll by allChecked
+    var checkAll by rememberSaveable { mutableStateOf(
+        currentSeasonEpisodes.isNotEmpty() && currentSeasonEpisodes.all {
+            it.isChecked == true
+        }) }
 
     LaunchedEffect(key1 = seasonSelected) {
         onSeasonSelected(seasonSelected)
@@ -216,17 +212,18 @@ fun TvShowEpisodeChecker(
                     Column(
                         modifier = Modifier
                             .clickable {
-                                val newChecked = !checkedAll
-                                onCheckAllEpisodes(currentSeasonEpisodes, newChecked)
+                                onCheckAllEpisodes(currentSeasonEpisodes, !checkAll)
+                                checkAll = !checkAll
                             }
                             .fillMaxWidth()
-                            .padding(0.dp)) {
+                            .padding(0.dp)
+                    ) {
                         Divider()
                         ListItem(modifier = Modifier, headlineContent = {
                             Text(stringResource(R.string.check_all), modifier = Modifier)
                         }, trailingContent = {
                             Checkbox(
-                                checked = checkedAll,
+                                checked = checkAll,
                                 modifier = Modifier,
                                 onCheckedChange = null
                             )
@@ -237,15 +234,14 @@ fun TvShowEpisodeChecker(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 0.dp, top = 0.dp, bottom = 16.dp, end = 0.dp)
+                        .padding(start = 0.dp, top = 0.dp, bottom = 16.dp, end = 0.dp),
+                    state = rememberLazyListState(),
                 ) {
-                    itemsIndexed(currentSeasonEpisodes) { index, seasonEpisode ->
+                    itemsIndexed(
+                        items = currentSeasonEpisodes,
+                        key = { _, episode -> episode.episodeId }
+                    ) { index, seasonEpisode ->
                         var isExpanded by remember { mutableStateOf(false) }
-                        var isWatched by rememberSaveable {
-                            mutableStateOf(
-                                seasonEpisode.isChecked ?: false
-                            )
-                        }
 
                         ListItem(
                             headlineContent = {
@@ -271,13 +267,12 @@ fun TvShowEpisodeChecker(
                                 )
                             }, trailingContent = {
                                 Checkbox(
-                                    checked = isWatched,
+                                    checked = seasonEpisode.isChecked ?: false,
                                     onCheckedChange = null,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             }, modifier = Modifier.clickable {
-                                val newWatchedState = !isWatched
-                                isWatched = newWatchedState
+                                val newWatchedState = !(seasonEpisode.isChecked ?: false)
                                 onEpisodeWatchedToggle(seasonEpisode.episodeId, newWatchedState)
                             })
                         Divider()

@@ -1,7 +1,6 @@
 package com.example.tvshowlist.presentation
 
-import android.content.Context
-import androidx.compose.ui.platform.LocalContext
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -10,7 +9,6 @@ import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.domain.repositories.TvShowsRepository
 import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.EpisodeCheckerUIState
-import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -178,11 +176,14 @@ class MainViewModel(
             try {
                 repository.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatched)
                 _episodeCheckerUIState.update { state ->
-                    state.seasonEpisodes.filter { it.episodeId == episodeId }.map {
-                        it.isChecked = isWatched
-                        it
+                    val updatedSeasonEpisodes = state.seasonEpisodes.map {
+                        if (it.episodeId == episodeId) {
+                            it.copy(isChecked = isWatched)
+                        } else {
+                            it
+                        }
                     }
-                    state
+                    state.copy(seasonEpisodes = updatedSeasonEpisodes)
                 }
             } catch (e: Exception) {
                 _error.value = "Failed to update episode status: ${e.message}"

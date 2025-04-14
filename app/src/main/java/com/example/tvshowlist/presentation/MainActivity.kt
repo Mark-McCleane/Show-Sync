@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         TvShowEpisodeChecker(
-                            tvShowId = args.tvShowId,
+                            tvShowId = tvShowId,
                             tvShowName = args.tvShowName,
                             tvShow = state.tvShow,
                             seasonEpisodes = state.seasonEpisodes,
@@ -69,11 +69,11 @@ class MainActivity : ComponentActivity() {
                             error = state.error,
                             onSeasonSelected = { seasonNumber ->
                                 if (ApplicationOnlineChecker.isOnline(context)) {
-                                    viewModel.getTvShowSeasons(args.tvShowId, seasonNumber)
+                                    viewModel.getTvShowSeasons(tvShowId, seasonNumber)
                                 } else {
-                                    viewModel.getTvShowSeasonsOffline(args.tvShowId, seasonNumber)
+                                    viewModel.getTvShowSeasonsOffline(tvShowId, seasonNumber)
                                 }
-                                viewModel.getTop10TvShowEpisodesById(args.tvShowId)
+                                viewModel.getTop10TvShowEpisodesById(tvShowId)
                             },
                             onEpisodeWatchedToggle = { episodeId, isWatched ->
                                 viewModel.updateIsWatchedState(episodeId, isWatched)
