@@ -37,8 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +45,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -58,9 +57,7 @@ import coil3.compose.AsyncImage
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
-import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
-import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -221,8 +218,7 @@ fun TvShowEpisodeChecker(
                         Divider()
                         ListItem(modifier = Modifier, headlineContent = {
                             Text(stringResource(R.string.check_all), modifier = Modifier)
-                        }, trailingContent = {}
-                        )
+                        })
                         Divider()
                     }
                 }
@@ -253,22 +249,42 @@ fun TvShowEpisodeChecker(
                                 )
                             }, overlineContent = {},
                             leadingContent = {
+                                val manuallyRevealed = rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
+
+                                val blurValue = if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked) {
+                                    0.dp
+                                } else {
+                                    15.dp
+                                }
+
                                 AsyncImage(
                                     model = seasonEpisode.episodeImage,
                                     error = painterResource(id = android.R.drawable.stat_notify_error),
-                                    contentDescription = "${seasonEpisode.episodeName} Episode Image",
+                                    contentDescription = stringResource(
+                                        R.string.episode_image,
+                                        seasonEpisode.episodeName
+                                    ),
                                     contentScale = ContentScale.Fit,
-                                    modifier = Modifier.size(100.dp)
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clickable {
+                                            manuallyRevealed.value = !manuallyRevealed.value
+                                        }
+                                        .blur(blurValue)
                                 )
                             }, trailingContent = {
                                 Checkbox(
-                                    checked = seasonEpisode.isChecked ?: false,
+                                    checked = seasonEpisode.isChecked,
                                     onCheckedChange = null,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             }, modifier = Modifier.clickable {
-                                val newWatchedState = !(seasonEpisode.isChecked ?: false)
-                                onEpisodeWatchedToggle(seasonEpisode.episodeId, newWatchedState, seasonSelected)
+                                val newWatchedState = !(seasonEpisode.isChecked)
+                                onEpisodeWatchedToggle(
+                                    seasonEpisode.episodeId,
+                                    newWatchedState,
+                                    seasonSelected
+                                )
                             })
                         Divider()
                     }

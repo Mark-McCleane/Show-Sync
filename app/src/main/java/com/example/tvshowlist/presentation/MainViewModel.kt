@@ -176,8 +176,8 @@ class MainViewModel(
 
         // Handle empty list case
         val allSameValue = episodesInSeason.isEmpty() ||
-                episodesInSeason.all { it.isChecked == true } ||
-                episodesInSeason.all { it.isChecked == false }
+                episodesInSeason.all { it.isChecked } ||
+                episodesInSeason.all { !it.isChecked }
 
         // Only update if the value is different from current state
         if (_episodeCheckerUIState.value.checkedButton != allSameValue) {

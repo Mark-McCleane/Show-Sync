@@ -7,4 +7,5 @@
     <string name="search_tv_show">Search Tv Show</string>
     <string name="clear_search_tv_shows">Clear Search Tv Shows</string>
     <string name="top_episodes">Top Episodes</string>
+    <string name="episode_image">%1$s Episode Image</string>
 </resources>
