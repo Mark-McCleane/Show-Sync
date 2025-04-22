@@ -13,7 +13,7 @@ class TvShowCheckerApplication : Application() {
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@TvShowCheckerApplication)
-            modules(AppModules.mainModule, AppModules.databaseModule)
+            modules(AppModules.mainModule, AppModules.settingsModule, AppModules.databaseModule)
         }
     }
 }

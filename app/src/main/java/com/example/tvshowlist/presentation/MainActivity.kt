@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.tvshowlist.presentation.ui.HomeScreen
 import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.TvShowEpisodeChecker
-import com.example.tvshowlist.presentation.ui.SettingScreen
+import com.example.tvshowlist.presentation.ui.SettingsScreen.SettingScreen
 import com.example.tvshowlist.presentation.ui.theme.TvShowListTheme
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import kotlinx.serialization.Serializable

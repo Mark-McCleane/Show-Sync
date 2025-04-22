@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val repository: TvShowsRepository
 ) : ViewModel() {
-
     private val _episodeCheckerUIState = MutableStateFlow(EpisodeCheckerUIState())
     val episodeCheckerUIState = _episodeCheckerUIState.asStateFlow()
 

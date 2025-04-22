@@ -75,11 +75,14 @@ dependencies {
 
     implementation(libs.retrofit2.retrofit)
     implementation(libs.converter.gson)
+
     //coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
     //gson
     implementation(libs.gson)
+
     //logging
     implementation(libs.logging.interceptor)
 
@@ -87,10 +90,14 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    //Room
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.ksp.api)
     implementation(libs.room.ktx)
+
+    //DataStore
+    implementation (libs.androidx.datastore.preferences)
 
     //Koin
     implementation(libs.koin.android)
