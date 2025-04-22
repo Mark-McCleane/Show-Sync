@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,7 +51,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel = koinViewModel(),
-    navigateTo: (tvShow: TvShow) -> Unit
+    navigateTo: (tvShow: TvShow) -> Unit,
+    navigateToSettings: () -> Unit
 ) {
     val searchText by viewModel.searchText.collectAsState()
     val tvShowList by viewModel.tvShowList.collectAsState()
@@ -77,7 +79,17 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "TV Show App") })
+            TopAppBar(
+                title = { Text(text = "TV Show App") },
+                actions = {
+                    IconButton(onClick = { navigateToSettings() }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings)
+                        )
+                    }
+                }
+            )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
