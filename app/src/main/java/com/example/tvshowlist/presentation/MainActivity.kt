@@ -9,9 +9,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +18,7 @@ import androidx.navigation.toRoute
 import com.example.tvshowlist.presentation.ui.HomeScreen
 import com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen.TvShowEpisodeChecker
 import com.example.tvshowlist.presentation.ui.SettingsScreen.SettingScreen
+import com.example.tvshowlist.presentation.ui.SettingsScreen.SettingsViewModel
 import com.example.tvshowlist.presentation.ui.theme.TvShowListTheme
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import kotlinx.serialization.Serializable
@@ -32,9 +32,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TvShowListTheme {
-                val viewModel: MainViewModel = koinViewModel()
+                val mainViewModel: MainViewModel = koinViewModel()
+                val settingsViewModel: SettingsViewModel = koinViewModel()
                 val navController = rememberNavController()
-                var censorPotentialSpoilers by rememberSaveable { mutableStateOf(true) }
+                val isPotentialSpoilerCensorshipEnabled by settingsViewModel.isPotentialSpoilerCensorshipEnabled.collectAsStateWithLifecycle()
 
                 NavHost(navController = navController, startDestination = SearchScreenRoute) {
                     composable<SearchScreenRoute> {
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
                             viewModel = koinViewModel(),
                             navigateTo = {
                                 it.addedToRecentDate = System.currentTimeMillis()
-                                viewModel.insertRecentTvShow(it)
+                                mainViewModel.insertRecentTvShow(it)
                                 navController.navigate(TvShowCheckerScreenRoute(it.id, it.title))
                             },
                             navigateToSettings = {
@@ -54,9 +55,9 @@ class MainActivity : ComponentActivity() {
                     composable<SettingScreenRoute> {
                         SettingScreen(
                             viewModel = koinViewModel(),
-                            censorContent = censorPotentialSpoilers,
+                            censorContent = isPotentialSpoilerCensorshipEnabled,
                             onCensorPotentialSpoilerContentChange = {
-                                censorPotentialSpoilers = !censorPotentialSpoilers
+                                settingsViewModel.setPotentialSpoilerEnabled(it)
                             },
                             navigateToHome = {
                                 navController.navigate(SearchScreenRoute)
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
 
                     composable<TvShowCheckerScreenRoute> { backStackEntry ->
                         val args = backStackEntry.toRoute<TvShowCheckerScreenRoute>()
-                        val state by viewModel.episodeCheckerUIState.collectAsState()
+                        val state by mainViewModel.episodeCheckerUIState.collectAsState()
                         val context = LocalContext.current
 
                         val tvShowId = args.tvShowId
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
                         LaunchedEffect(Unit) {
                             if (!hasLoadedData.value && ApplicationOnlineChecker.isOnline(context)) {
-                                viewModel.getTvShowById(tvShowId)
+                                mainViewModel.getTvShowById(tvShowId)
                                 hasLoadedData.value = true
                             }
                         }
@@ -90,18 +91,18 @@ class MainActivity : ComponentActivity() {
                             error = state.error,
                             onSeasonSelected = { seasonNumber ->
                                 if (ApplicationOnlineChecker.isOnline(context)) {
-                                    viewModel.getTvShowSeasons(tvShowId, seasonNumber)
+                                    mainViewModel.getTvShowSeasons(tvShowId, seasonNumber)
                                 } else {
-                                    viewModel.getTvShowSeasonsOffline(tvShowId, seasonNumber)
+                                    mainViewModel.getTvShowSeasonsOffline(tvShowId, seasonNumber)
                                 }
-                                viewModel.getTop10TvShowEpisodesById(tvShowId)
+                                mainViewModel.getTop10TvShowEpisodesById(tvShowId)
                             },
                             onEpisodeWatchedToggle = { episodeId, isWatched, seasonNumber ->
-                                viewModel.updateIsWatchedState(episodeId, isWatched, seasonNumber)
+                                mainViewModel.updateIsWatchedState(episodeId, isWatched, seasonNumber)
                             },
                             onCheckAllEpisodes = { seasonEpisodes, isChecked, seasonNumber ->
                                 seasonEpisodes.forEach { episode ->
-                                    viewModel.updateIsWatchedState(
+                                    mainViewModel.updateIsWatchedState(
                                         episode.episodeId,
                                         isChecked,
                                         seasonNumber
