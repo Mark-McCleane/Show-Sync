@@ -1,6 +1,8 @@
 package com.example.tvshowlist.presentation
 
 
+import android.os.Build
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tvshowlist.data.entities.search.Result
@@ -20,6 +22,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.Locale
 
 @OptIn(FlowPreview::class)
 class MainViewModel(
@@ -204,6 +210,23 @@ class MainViewModel(
             } catch (e: Exception) {
                 _error.value = "Failed to update episode status: ${e.message}"
             }
+        }
+    }
+
+    fun formatDate(episodeAirDate: String): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return episodeAirDate
+
+        val inputFormatter = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd", Locale.getDefault()
+        )
+
+        val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+        return try {
+            val date = LocalDate.parse(episodeAirDate, inputFormatter)
+            date.format(outputFormatter)
+        } catch (e: DateTimeParseException) {
+            Log.e("Date Format Exception", "Failed To Format Date: $episodeAirDate\n ${e.localizedMessage ?: ""}")
+            episodeAirDate
         }
     }
 }

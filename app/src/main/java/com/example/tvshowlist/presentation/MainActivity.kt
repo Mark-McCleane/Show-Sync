@@ -93,6 +93,9 @@ class MainActivity : ComponentActivity() {
                             navigateBack = {
                                 navController.popBackStack()
                             },
+                            formatAirDate = { date ->
+                                mainViewModel.formatDate(date)
+                            },
                             onSeasonSelected = { seasonNumber ->
                                 if (ApplicationOnlineChecker.isOnline(context)) {
                                     mainViewModel.getTvShowSeasons(tvShowId, seasonNumber)

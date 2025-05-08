@@ -1,7 +1,5 @@
 package com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen
 
-import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,9 +59,6 @@ import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +73,7 @@ fun TvShowEpisodeChecker(
     error: String,
     checkedButton: Boolean,
     isCensored: Boolean,
+    formatAirDate: (String) -> String,
     navigateBack: () -> Unit,
     onSeasonSelected: (Int) -> Unit,
     onEpisodeWatchedToggle: (Int, Boolean, Int) -> Unit,
@@ -89,6 +85,7 @@ fun TvShowEpisodeChecker(
     var isSeasonsDropDownExpanded by remember {
         mutableStateOf(false)
     }
+
     var seasonSelected by remember {
         mutableIntStateOf(1)
     }
@@ -266,7 +263,7 @@ fun TvShowEpisodeChecker(
                                     text = seasonEpisodeText,
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
-                                RatingSection(tvShowSeasonEpisodes = seasonEpisode)
+                                RatingSection(tvShowSeasonEpisodes = seasonEpisode, formatAirDate(seasonEpisode.episodeAirDate))
                             }, supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
@@ -333,7 +330,7 @@ fun TvShowEpisodeChecker(
 }
 
 @Composable
-private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
+private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes, airDate: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End
     ) {
@@ -352,7 +349,6 @@ private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
                 .align(Alignment.CenterVertically)
                 .weight(0.25f)
         )
-        val airDate = formatDate(tvShowSeasonEpisodes.episodeAirDate)
         Text(
             text = airDate,
             maxLines = 1,
@@ -361,21 +357,5 @@ private fun RatingSection(tvShowSeasonEpisodes: TvShowSeasonEpisodes) {
                 .align(Alignment.CenterVertically)
                 .weight(1f)
         )
-    }
-}
-
-private fun formatDate(episodeAirDate: String): String {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return episodeAirDate
-
-    val inputFormatter = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd", Locale.getDefault()
-    )
-    val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
-    return try {
-        val date = LocalDate.parse(episodeAirDate, inputFormatter)
-        date.format(outputFormatter)
-    } catch (e: DateTimeParseException) {
-        Log.e("Date Format Exception", "Failed To Format Date: $episodeAirDate\n")
-        episodeAirDate
     }
 }
