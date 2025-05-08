@@ -1,6 +1,7 @@
 package com.example.tvshowlist.presentation.ui.EpisodeCheckerScreen
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Checkbox
@@ -27,6 +29,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -74,7 +77,8 @@ fun TvShowEpisodeChecker(
     isEpisodesLoaded: Boolean,
     error: String,
     checkedButton: Boolean,
-    censorship: Boolean,
+    isCensored: Boolean,
+    navigateBack: () -> Unit,
     onSeasonSelected: (Int) -> Unit,
     onEpisodeWatchedToggle: (Int, Boolean, Int) -> Unit,
     onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean, Int) -> Unit
@@ -120,6 +124,13 @@ fun TvShowEpisodeChecker(
             Text(
                 text = tvShow?.title ?: tvShowName
             )
+        }, navigationIcon = {
+            IconButton(onClick = navigateBack) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.dropdown_arrow)
+                )
+            }
         })
     }, snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
@@ -236,7 +247,11 @@ fun TvShowEpisodeChecker(
                         items = currentSeasonEpisodes,
                         key = { _, episode -> episode.episodeId }
                     ) { index, seasonEpisode ->
-                        var isExpanded by rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
+                        var isExpanded by rememberSaveable(seasonEpisode.episodeId) {
+                            mutableStateOf(
+                                false
+                            )
+                        }
                         var isTextEnabled by rememberSaveable(seasonEpisode.episodeId) {
                             mutableStateOf(
                                 index == 0 || currentSeasonEpisodes[index - 1].isChecked || isExpanded
@@ -245,7 +260,8 @@ fun TvShowEpisodeChecker(
 
                         ListItem(
                             headlineContent = {
-                                val seasonEpisodeText = if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}"
+                                val seasonEpisodeText =
+                                    if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}"
                                 Text(
                                     text = seasonEpisodeText,
                                     modifier = Modifier.padding(bottom = 5.dp)
@@ -254,7 +270,7 @@ fun TvShowEpisodeChecker(
                             }, supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
-                                    modifier = if (censorship && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
+                                    modifier = if (isCensored && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
                                         Modifier
                                             .clickable {
                                                 isExpanded = !isExpanded
@@ -262,9 +278,9 @@ fun TvShowEpisodeChecker(
                                             }
                                             .blur(15.dp)
                                     else Modifier.clickable {
-                                            isExpanded = !isExpanded
-                                            isTextEnabled = !isTextEnabled
-                                        },
+                                        isExpanded = !isExpanded
+                                        isTextEnabled = !isTextEnabled
+                                    },
                                     maxLines = if (isExpanded) Int.MAX_VALUE else 3
                                 )
                             }, overlineContent = {},
@@ -273,7 +289,7 @@ fun TvShowEpisodeChecker(
                                     rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
 
                                 val blurValue =
-                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked || !censorship) {
+                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked || !isCensored) {
                                         0.dp
                                     } else {
                                         15.dp
@@ -359,6 +375,7 @@ private fun formatDate(episodeAirDate: String): String {
         val date = LocalDate.parse(episodeAirDate, inputFormatter)
         date.format(outputFormatter)
     } catch (e: DateTimeParseException) {
+        Log.e("Date Format Exception", "Failed To Format Date: $episodeAirDate\n")
         episodeAirDate
     }
 }

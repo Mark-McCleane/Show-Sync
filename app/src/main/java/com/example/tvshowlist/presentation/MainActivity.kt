@@ -59,8 +59,8 @@ class MainActivity : ComponentActivity() {
                             onCensorPotentialSpoilerContentChange = {
                                 settingsViewModel.setPotentialSpoilerEnabled(it)
                             },
-                            navigateToHome = {
-                                navController.navigate(SearchScreenRoute)
+                            navigateBack = {
+                                navController.popBackStack()
                             }
                         )
                     }
@@ -89,7 +89,10 @@ class MainActivity : ComponentActivity() {
                             top10Episodes = state.top10Episodes,
                             isEpisodesLoaded = state.isEpisodesLoaded,
                             error = state.error,
-                            censorship = isPotentialSpoilerCensorshipEnabled,
+                            isCensored = isPotentialSpoilerCensorshipEnabled,
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
                             onSeasonSelected = { seasonNumber ->
                                 if (ApplicationOnlineChecker.isOnline(context)) {
                                     mainViewModel.getTvShowSeasons(tvShowId, seasonNumber)
