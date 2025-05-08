@@ -74,6 +74,7 @@ fun TvShowEpisodeChecker(
     isEpisodesLoaded: Boolean,
     error: String,
     checkedButton: Boolean,
+    censorship: Boolean,
     onSeasonSelected: (Int) -> Unit,
     onEpisodeWatchedToggle: (Int, Boolean, Int) -> Unit,
     onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean, Int) -> Unit
@@ -244,15 +245,16 @@ fun TvShowEpisodeChecker(
 
                         ListItem(
                             headlineContent = {
+                                val seasonEpisodeText = if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}"
                                 Text(
-                                    text = if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}",
+                                    text = seasonEpisodeText,
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
                                 RatingSection(tvShowSeasonEpisodes = seasonEpisode)
                             }, supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
-                                    modifier = if (!isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
+                                    modifier = if (censorship && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
                                         Modifier
                                             .clickable {
                                                 isExpanded = !isExpanded
@@ -271,7 +273,7 @@ fun TvShowEpisodeChecker(
                                     rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
 
                                 val blurValue =
-                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked) {
+                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked || !censorship) {
                                         0.dp
                                     } else {
                                         15.dp

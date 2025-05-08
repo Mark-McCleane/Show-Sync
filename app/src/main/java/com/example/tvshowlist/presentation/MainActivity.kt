@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
                             top10Episodes = state.top10Episodes,
                             isEpisodesLoaded = state.isEpisodesLoaded,
                             error = state.error,
+                            censorship = isPotentialSpoilerCensorshipEnabled,
                             onSeasonSelected = { seasonNumber ->
                                 if (ApplicationOnlineChecker.isOnline(context)) {
                                     mainViewModel.getTvShowSeasons(tvShowId, seasonNumber)
