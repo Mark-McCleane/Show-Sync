@@ -40,9 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tvshowlist.R
-import com.example.tvshowlist.presentation.MainViewModel
-import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
+import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.presentation.ui.items.ItemTvShow
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import org.koin.androidx.compose.koinViewModel
@@ -150,10 +149,6 @@ fun HomeScreen(
                         ) { tvShow ->
                             ItemTvShow(
                                 tvShow = tvShow,
-                                tvShowTitle = tvShow.title,
-                                tvShowTagLine = tvShow.description ?: "No Description Found",
-                                tvShowAirDate = tvShow.airDate ?: "N/A",
-                                imageUrl = RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath,
                                 modifier = Modifier.wrapContentSize(),
                                 navigateTo = navigateTo
                             )
