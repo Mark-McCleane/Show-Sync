@@ -224,11 +224,18 @@ fun HomeScreen(
                                                 targetValue = if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
                                             )
 
+                                            val color =
+                                                if (dismissState.targetValue == DismissValue.DismissedToEnd || dismissState.targetValue == DismissValue.DismissedToStart) Color.Red else Color.Transparent
+                                            val alignment =
+                                                if (dismissState.targetValue == DismissValue.DismissedToEnd) Alignment.CenterStart else Alignment.CenterEnd
+
+
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxSize()
+                                                    .background(color)
                                                     .padding(horizontal = 20.dp),
-                                                contentAlignment = Alignment.CenterEnd
+                                                contentAlignment = alignment
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Delete,
