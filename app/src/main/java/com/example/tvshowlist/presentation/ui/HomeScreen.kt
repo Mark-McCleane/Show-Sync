@@ -58,6 +58,7 @@ import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.presentation.MainViewModel
 import com.example.tvshowlist.presentation.ui.items.ItemTvShow
+import com.example.tvshowlist.presentation.ui.items.SwipeToDeleteContainer
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
 import org.koin.androidx.compose.koinViewModel
 
@@ -91,37 +92,31 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(size = 50.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.app_name)
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navigateToSettings() }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.settings)
-                        )
-                    }
-                }
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(size = 50.dp)
+                )
+                Text(
+                    text = stringResource(R.string.app_name)
+                )
+            }
+        }, actions = {
+            IconButton(onClick = { navigateToSettings() }) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings)
+                )
+            }
+        })
+    }, snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+    }
 
     ) { innerPadding ->
         Column(
@@ -175,9 +170,7 @@ fun HomeScreen(
                                 .padding(vertical = 16.dp)
                         ) {
                             items(
-                                items = tvShowList,
-                                key = { tvShow -> tvShow.id }
-                            ) { tvShow ->
+                                items = tvShowList, key = { tvShow -> tvShow.id }) { tvShow ->
                                 if (searchText.isNotEmpty()) {
                                     ItemTvShow(
                                         tvShow = tvShow,
@@ -194,9 +187,7 @@ fun HomeScreen(
                                 .padding(vertical = 16.dp)
                         ) {
                             items(
-                                items = recentTvShowList,
-                                key = { tvShow -> tvShow.id }
-                            ) { tvShow ->
+                                items = recentTvShowList, key = { tvShow -> tvShow.id }) { tvShow ->
                                 if (searchText.isNotEmpty()) {
                                     ItemTvShow(
                                         tvShow = tvShow,
@@ -204,54 +195,20 @@ fun HomeScreen(
                                         navigateTo = navigateTo
                                     )
                                 } else {
-                                    val dismissState = rememberDismissState(
-                                        confirmValueChange = {
-                                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                                                viewModel.deleteRecentTvShow(tvShow)
-                                                true
-                                            } else false
-                                        }
-                                    )
-
-                                    SwipeToDismiss(
-                                        state = dismissState,
-                                        directions = setOf(
-                                            DismissDirection.EndToStart,
-                                            DismissDirection.StartToEnd
-                                        ),
-                                        background = {
-                                            val scale by animateFloatAsState(
-                                                targetValue = if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
-                                            )
-
-                                            val color =
-                                                if (dismissState.targetValue == DismissValue.DismissedToEnd || dismissState.targetValue == DismissValue.DismissedToStart) Color.Red else Color.Transparent
-                                            val alignment =
-                                                if (dismissState.targetValue == DismissValue.DismissedToEnd) Alignment.CenterStart else Alignment.CenterEnd
-
-
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .background(color)
-                                                    .padding(horizontal = 20.dp),
-                                                contentAlignment = alignment
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Delete Tv Show",
-                                                    modifier = Modifier.scale(scale)
-                                                )
-                                            }
+                                    SwipeToDeleteContainer(
+                                        item = tvShow,
+                                        onDelete = {
+                                            viewModel.deleteRecentTvShow(tvShow)
                                         },
-                                        dismissContent = {
-                                            ItemTvShow(
-                                                tvShow = tvShow,
-                                                modifier = Modifier.wrapContentSize(),
-                                                navigateTo = navigateTo
-                                            )
-                                        }
-                                    )
+                                        animationDuration = 500
+                                    ) {
+                                        ItemTvShow(
+                                            tvShow = tvShow,
+                                            modifier = Modifier.wrapContentSize(),
+                                            navigateTo = navigateTo
+                                        )
+                                    }
+
                                 }
                             }
                         }
