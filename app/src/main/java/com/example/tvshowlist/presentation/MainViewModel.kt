@@ -111,6 +111,7 @@ class MainViewModel(
     fun insertRecentTvShow(tvShow: TvShow) {
         viewModelScope.launch {
             repository.insertRecentTvShow(tvShow = tvShow)
+            getRecentTvShows()
         }
     }
 

@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.model.TvShow
 import com.example.tvshowlist.presentation.MainViewModel
-import com.example.tvshowlist.presentation.ui.items.ConfirmationDialog
 import com.example.tvshowlist.presentation.ui.items.ItemTvShow
 import com.example.tvshowlist.presentation.ui.items.SwipeToDeleteContainer
 import com.example.tvshowlist.utils.ApplicationOnlineChecker
@@ -86,27 +85,30 @@ fun HomeScreen(
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(size = 50.dp)
-                )
-                Text(
-                    text = stringResource(R.string.app_name)
-                )
+        TopAppBar(
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(size = 50.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.app_name)
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { navigateToSettings() }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
+                }
             }
-        }, actions = {
-            IconButton(onClick = { navigateToSettings() }) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings)
-                )
-            }
-        })
+        )
     }, snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
     }
@@ -163,7 +165,9 @@ fun HomeScreen(
                                 .padding(vertical = 16.dp)
                         ) {
                             items(
-                                items = tvShowList, key = { tvShow -> tvShow.id }) { tvShow ->
+                                items = tvShowList,
+                                key = { tvShow -> tvShow.id }
+                            ) { tvShow ->
                                 if (searchText.isNotEmpty()) {
                                     ItemTvShow(
                                         tvShow = tvShow,
@@ -180,7 +184,9 @@ fun HomeScreen(
                                 .padding(vertical = 16.dp)
                         ) {
                             items(
-                                items = recentTvShowList, key = { tvShow -> tvShow.id }) { tvShow ->
+                                items = recentTvShowList,
+                                key = { tvShow -> tvShow.id }
+                            ) { tvShow ->
                                 if (searchText.isNotEmpty()) {
                                     ItemTvShow(
                                         tvShow = tvShow,
@@ -188,30 +194,10 @@ fun HomeScreen(
                                         navigateTo = navigateTo
                                     )
                                 } else {
-                                    var showDeletionDialog by remember { mutableStateOf(false) }
-                                    var isRecentShowRemoved by remember { mutableStateOf(false) }
-
-                                    ConfirmationDialog(
-                                        showDialog = showDeletionDialog,
-                                        title = context.getString(R.string.recent_tv_show_deletion_title),
-                                        message = context.getString(R.string.delete_recent_tv_show_confirmation),
-                                        confirmButtonText = context.getString(R.string.delete),
-                                        onConfirm = {
-                                            viewModel.deleteRecentTvShow(tvShow)
-                                            isRecentShowRemoved = true
-                                        },
-                                        onDismiss = {
-                                            showDeletionDialog = false
-                                            isRecentShowRemoved = false
-                                        }
-                                    )
                                     SwipeToDeleteContainer(
                                         item = tvShow,
-                                        isRecentShowRemoved = isRecentShowRemoved,
-                                        onDelete = {
-                                            showDeletionDialog = true
-                                        },
-                                        animationDuration = 500
+                                        onDelete = { viewModel.deleteRecentTvShow(tvShow) },
+                                        animationDuration = 500,
                                     ) {
                                         ItemTvShow(
                                             tvShow = tvShow,
@@ -219,7 +205,6 @@ fun HomeScreen(
                                             navigateTo = navigateTo
                                         )
                                     }
-
                                 }
                             }
                         }

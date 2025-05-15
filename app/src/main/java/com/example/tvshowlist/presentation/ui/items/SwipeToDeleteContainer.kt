@@ -35,18 +35,18 @@ fun <T> SwipeToDeleteContainer(
     item: T,
     onDelete: (T) -> Unit,
     animationDuration: Int = 500,
-    isRecentShowRemoved: Boolean = false,
     content: @Composable (T) -> Unit
 ) {
     var isRemoved by remember {
-        mutableStateOf(isRecentShowRemoved)
+        mutableStateOf(false)
     }
     val state = rememberDismissState(
         confirmValueChange = { value ->
-            if (value == DismissValue.DismissedToStart || value == DismissValue.DismissedToEnd && isRecentShowRemoved) {
+            if (value == DismissValue.DismissedToStart || value == DismissValue.DismissedToEnd) {
                 isRemoved = true
                 true
             } else {
+                isRemoved = true
                 false
             }
         }
