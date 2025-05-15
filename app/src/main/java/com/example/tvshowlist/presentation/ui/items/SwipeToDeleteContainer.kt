@@ -35,14 +35,15 @@ fun <T> SwipeToDeleteContainer(
     item: T,
     onDelete: (T) -> Unit,
     animationDuration: Int = 500,
+    isRecentShowRemoved: Boolean = false,
     content: @Composable (T) -> Unit
 ) {
     var isRemoved by remember {
-        mutableStateOf(false)
+        mutableStateOf(isRecentShowRemoved)
     }
     val state = rememberDismissState(
         confirmValueChange = { value ->
-            if (value == DismissValue.DismissedToStart || value == DismissValue.DismissedToEnd) {
+            if (value == DismissValue.DismissedToStart || value == DismissValue.DismissedToEnd && isRecentShowRemoved) {
                 isRemoved = true
                 true
             } else {
@@ -52,7 +53,7 @@ fun <T> SwipeToDeleteContainer(
     )
 
     LaunchedEffect(key1 = isRemoved) {
-        if(isRemoved) {
+        if (isRemoved) {
             delay(animationDuration.toLong())
             onDelete(item)
         }
@@ -81,11 +82,13 @@ fun <T> SwipeToDeleteContainer(
 fun DeleteBackground(
     swipeDismissState: DismissState
 ) {
-    val color = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart || swipeDismissState.dismissDirection == DismissDirection.StartToEnd) {
-        Color.Red
-    } else Color.Transparent
+    val color =
+        if (swipeDismissState.dismissDirection == DismissDirection.EndToStart || swipeDismissState.dismissDirection == DismissDirection.StartToEnd) {
+            Color.Red
+        } else Color.Transparent
 
-    val alignment = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
+    val alignment =
+        if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
         else Alignment.CenterStart
 
     Box(
