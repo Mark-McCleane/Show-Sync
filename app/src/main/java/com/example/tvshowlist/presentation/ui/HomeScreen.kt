@@ -1,6 +1,9 @@
 package com.example.tvshowlist.presentation.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,9 +18,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,9 +31,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +43,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -158,19 +168,85 @@ fun HomeScreen(
                         )
                     }
                 } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
-                    ) {
-                        items(
-                            if (searchText.isNotEmpty()) tvShowList else recentTvShowList
-                        ) { tvShow ->
-                            ItemTvShow(
-                                tvShow = tvShow,
-                                modifier = Modifier.wrapContentSize(),
-                                navigateTo = navigateTo
-                            )
+                    if (searchText.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
+                        ) {
+                            items(
+                                items = tvShowList,
+                                key = { tvShow -> tvShow.id }
+                            ) { tvShow ->
+                                if (searchText.isNotEmpty()) {
+                                    ItemTvShow(
+                                        tvShow = tvShow,
+                                        modifier = Modifier.wrapContentSize(),
+                                        navigateTo = navigateTo
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
+                        ) {
+                            items(
+                                items = recentTvShowList,
+                                key = { tvShow -> tvShow.id }
+                            ) { tvShow ->
+                                if (searchText.isNotEmpty()) {
+                                    ItemTvShow(
+                                        tvShow = tvShow,
+                                        modifier = Modifier.wrapContentSize(),
+                                        navigateTo = navigateTo
+                                    )
+                                } else {
+                                    val dismissState = rememberDismissState(
+                                        confirmValueChange = {
+                                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
+                                                viewModel.deleteRecentTvShow(tvShow)
+                                                true
+                                            } else false
+                                        }
+                                    )
+
+                                    SwipeToDismiss(
+                                        state = dismissState,
+                                        directions = setOf(
+                                            DismissDirection.EndToStart,
+                                            DismissDirection.StartToEnd
+                                        ),
+                                        background = {
+                                            val scale by animateFloatAsState(
+                                                targetValue = if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+                                            )
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(horizontal = 20.dp),
+                                                contentAlignment = Alignment.CenterEnd
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete Tv Show",
+                                                    modifier = Modifier.scale(scale)
+                                                )
+                                            }
+                                        },
+                                        dismissContent = {
+                                            ItemTvShow(
+                                                tvShow = tvShow,
+                                                modifier = Modifier.wrapContentSize(),
+                                                navigateTo = navigateTo
+                                            )
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

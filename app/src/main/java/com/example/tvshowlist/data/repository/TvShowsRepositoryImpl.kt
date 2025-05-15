@@ -30,6 +30,8 @@ class TvShowsRepositoryImpl(private val dao: TvShowCheckerDao) : TvShowsReposito
 
     override suspend fun getRecentTvShows(): Flow<List<TvShow>> = flowOf(dao.getRecentTvShows())
 
+    override suspend fun deleteRecentTvShow(tvShow: TvShow) = dao.deleteRecentTvShow(tvShow = tvShow)
+
     override suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean) =
         dao.updateIsWatchedStatus(episodeId = episodeId, isWatchedStatus = isWatchedStatus)
 

@@ -15,6 +15,7 @@ interface TvShowsRepository {
     suspend fun insertTvShow(tvShow: TvShowSeasonEpisodes)
     suspend fun insertRecentTvShow(tvShow: TvShow)
     suspend fun getRecentTvShows(): Flow<List<TvShow>>
+    suspend fun deleteRecentTvShow(tvShow: TvShow)
     suspend fun updateIsWatchedStatus(episodeId: Int, isWatchedStatus: Boolean)
     suspend fun getIsWatchedStatus(episodeId: Int): Boolean
     suspend fun getTvShowSeasonOffline(

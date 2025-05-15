@@ -1,6 +1,7 @@
 package com.example.tvshowlist.data.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.example.tvshowlist.domain.model.TvShow
@@ -10,6 +11,9 @@ import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
 interface TvShowCheckerDao {
     @Upsert
     suspend fun insertRecentTvShow(tvShow: TvShow)
+
+    @Delete
+    suspend fun deleteRecentTvShow(tvShow: TvShow)
 
     @Query("SELECT * FROM tvShowTable t ORDER BY t.addedToRecentDate DESC LIMIT 20")
     suspend fun getRecentTvShows(): List<TvShow>

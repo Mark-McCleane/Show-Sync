@@ -229,4 +229,11 @@ class MainViewModel(
             episodeAirDate
         }
     }
+
+    fun deleteRecentTvShow(tvShow: TvShow) {
+        viewModelScope.launch {
+            _recentTvShowList.update { list -> list.filter { it.id != tvShow.id } }
+            repository.deleteRecentTvShow(tvShow)
+        }
+    }
 }
