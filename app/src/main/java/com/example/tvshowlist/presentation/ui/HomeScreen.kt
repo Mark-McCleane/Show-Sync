@@ -162,19 +162,18 @@ fun HomeScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 16.dp)
+                                .padding(vertical = 6.dp)
                         ) {
                             items(
                                 items = tvShowList,
                                 key = { tvShow -> tvShow.id }
                             ) { tvShow ->
-                                if (searchText.isNotEmpty()) {
-                                    ItemTvShow(
-                                        tvShow = tvShow,
-                                        modifier = Modifier.wrapContentSize(),
-                                        navigateTo = navigateTo
-                                    )
-                                }
+                                ItemTvShow(
+                                    tvShow = tvShow,
+                                    modifier = Modifier.wrapContentSize(),
+                                    navigateTo = navigateTo
+                                )
+
                             }
                         }
                     } else {
@@ -187,24 +186,16 @@ fun HomeScreen(
                                 items = recentTvShowList,
                                 key = { tvShow -> tvShow.id }
                             ) { tvShow ->
-                                if (searchText.isNotEmpty()) {
+                                SwipeToDeleteContainer(
+                                    item = tvShow,
+                                    onDelete = { viewModel.deleteRecentTvShow(tvShow) },
+                                    animationDuration = 500,
+                                ) {
                                     ItemTvShow(
                                         tvShow = tvShow,
                                         modifier = Modifier.wrapContentSize(),
                                         navigateTo = navigateTo
                                     )
-                                } else {
-                                    SwipeToDeleteContainer(
-                                        item = tvShow,
-                                        onDelete = { viewModel.deleteRecentTvShow(tvShow) },
-                                        animationDuration = 500,
-                                    ) {
-                                        ItemTvShow(
-                                            tvShow = tvShow,
-                                            modifier = Modifier.wrapContentSize(),
-                                            navigateTo = navigateTo
-                                        )
-                                    }
                                 }
                             }
                         }
