@@ -20,4 +20,5 @@
     <string name="delete_recent_tv_show_confirmation">Are you sure you want to delete this Tv Show. This will remove all your watched data</string>
     <string name="recent_tv_show_deletion_title">Recent Tv Show Deletion</string>
     <string name="delete">Delete</string>
+    <string name="no_air_date_found">No Air Date Found</string>
 </resources>
