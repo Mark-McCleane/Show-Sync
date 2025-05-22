@@ -21,4 +21,6 @@
     <string name="recent_tv_show_deletion_title">Recent Tv Show Deletion</string>
     <string name="delete">Delete</string>
     <string name="no_air_date_found">No Air Date Found</string>
+    <string name="delete_recent_tv_show_from_history_title">Are you sure you want to delete %1$s</string>
+    <string name="delete_recent_tv_show_from_history_message">Are you sure you want to delete %1$s from your recent showlist?\nIf you do this, it will not remove your watch data for %1$s</string>
 </resources>
