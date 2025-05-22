@@ -179,7 +179,6 @@ fun HomeScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 16.dp)
                         ) {
                             items(
                                 items = recentTvShowList,
@@ -192,10 +191,9 @@ fun HomeScreen(
                                 ) {
                                     ItemTvShow(
                                         tvShow = tvShow,
-                                        modifier = Modifier.wrapContentSize(),
+                                        modifier = Modifier,
                                         navigateTo = navigateTo
                                     )
-                                    Divider(modifier = Modifier.fillMaxWidth())
 
                                 }
                             }

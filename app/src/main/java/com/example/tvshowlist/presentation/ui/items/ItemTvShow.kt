@@ -2,13 +2,16 @@ package com.example.tvshowlist.presentation.ui.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -43,90 +46,94 @@ fun ItemTvShow(
     navigateTo: (tvShow: TvShow) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val clickableModifier = Modifier.clickable(
+        indication = rememberRipple(bounded = true, radius = 32.dp),
+        interactionSource = remember { MutableInteractionSource() }
+    ) { isExpanded = !isExpanded }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { navigateTo(tvShow) }
-    ) {
-        val clickableModifier = Modifier.clickable { isExpanded = !isExpanded }
-        var clickableHeight by remember {
-            mutableIntStateOf(IntSize.Zero.height)
-        }
+    var clickableHeight by remember {
+        mutableIntStateOf(IntSize.Zero.height)
+    }
 
-        ListItem(
-            modifier = Modifier.padding(0.dp),
-            leadingContent = {
-                AsyncImage(
-                    model = RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath,
-                    contentDescription = stringResource(
-                        R.string.tvShowTitle_cover_image,
-                        tvShow.title
-                    ),
-                    error = painterResource(id = android.R.drawable.stat_notify_error),
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.width(110.dp)
-                )
-            },
-            headlineContent = {
-                Text(
-                    text = tvShow.title,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            supportingContent = {
+    ListItem(
+        modifier = Modifier
+            .padding(0.dp)
+            .clickable { navigateTo(tvShow) },
+        leadingContent = {
+            AsyncImage(
+                model = RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath,
+                contentDescription = stringResource(
+                    R.string.tvShowTitle_cover_image,
+                    tvShow.title
+                ),
+                error = painterResource(id = android.R.drawable.stat_notify_error),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .onSizeChanged {
+                        if (clickableHeight < it.height / 2) {
+                            clickableHeight = it.height / 2
+                        }
+                    }
+                    .width(110.dp)
+            )
+        },
+        headlineContent = {
+            Text(
+                text = tvShow.title,
+                modifier = Modifier.fillMaxWidth(),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        supportingContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged {
+                        if (clickableHeight < it.height / 2) {
+                            clickableHeight = it.height / 2
+                        }
+                    }
+            ) {
                 Text(
                     text = tvShow.description?.ifEmpty { stringResource(R.string.no_description_found) }
                         ?: stringResource(R.string.no_description_found),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 2,
-                    modifier = Modifier
-                        .onSizeChanged {
-                            clickableHeight = it.height / 2
-                        }
-                        .fillMaxWidth(0.9f),
                     style = MaterialTheme.typography.bodyLarge
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(
                         R.string.aired_tvShowAirDate,
                         tvShow.airDate ?: stringResource(R.string.no_air_date_found)
                     ),
-                    modifier = Modifier.fillMaxWidth(0.9f),
                     style = MaterialTheme.typography.bodyLarge
                 )
-            },
-            trailingContent = {
-                val expandableArrow =
-                    if (isExpanded) painterResource(android.R.drawable.arrow_up_float) else painterResource(
-                        android.R.drawable.arrow_down_float
-                    )
-                val topPadding = if (isExpanded) 101.dp else clickableHeight.dp / 2
-                Column(
-                    modifier = clickableModifier
-                        .height(clickableHeight.dp)
-                        .padding(
-                            start = 8.dp,
-                            end = 8.dp,
-                            top = topPadding / 2,
-                            bottom = topPadding / 2
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painter = expandableArrow,
-                        contentDescription = null,
-                        modifier = clickableModifier
-                    )
-                }
-            },
-        )
-    }
+            }
+        },
+        trailingContent = {
+            val expandableArrow = if (isExpanded) painterResource(android.R.drawable.arrow_up_float)
+            else painterResource(
+                android.R.drawable.arrow_down_float
+            )
+
+            Column(
+                modifier = clickableModifier
+                    .heightIn(min = 200.dp, max = clickableHeight.dp)
+                    .padding(vertical = 16.dp, horizontal = 9.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = expandableArrow,
+                    contentDescription = null,
+                )
+            }
+        },
+    )
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)

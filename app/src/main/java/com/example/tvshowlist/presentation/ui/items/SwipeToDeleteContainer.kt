@@ -42,11 +42,11 @@ fun <T> SwipeToDeleteContainer(
     }
     val state = rememberDismissState(
         confirmValueChange = { value ->
-            if (value == DismissValue.DismissedToStart || value == DismissValue.DismissedToEnd) {
+            if (value == DismissValue.DismissedToEnd) {
                 isRemoved = true
                 true
             } else {
-                isRemoved = true
+                isRemoved = false
                 false
             }
         }
@@ -72,7 +72,7 @@ fun <T> SwipeToDeleteContainer(
                 DeleteBackground(swipeDismissState = state)
             },
             dismissContent = { content(item) },
-            directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd)
+            directions = setOf(DismissDirection.StartToEnd)
         )
     }
 }
@@ -83,12 +83,11 @@ fun DeleteBackground(
     swipeDismissState: DismissState
 ) {
     val color =
-        if (swipeDismissState.dismissDirection == DismissDirection.EndToStart || swipeDismissState.dismissDirection == DismissDirection.StartToEnd) {
+        if (swipeDismissState.dismissDirection == DismissDirection.StartToEnd) {
             Color.Red
         } else Color.Transparent
 
-    val alignment =
-        if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
+    val alignment = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
         else Alignment.CenterStart
 
     Box(
