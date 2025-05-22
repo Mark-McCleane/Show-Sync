@@ -35,22 +35,49 @@ fun <T> SwipeToDeleteContainer(
     item: T,
     onDelete: (T) -> Unit,
     animationDuration: Int = 500,
-    content: @Composable (T) -> Unit
-) {
+    onConfirmDeletion: () -> Unit,
+    onDeletionTitle: String,
+    onDeletionMessage: String,
+    content: @Composable (T) -> Unit,
+    ) {
     var isRemoved by remember {
         mutableStateOf(false)
     }
+
+    var showConfirmationDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var isConfirmed by remember { mutableStateOf(false) }
+
     val state = rememberDismissState(
         confirmValueChange = { value ->
             if (value == DismissValue.DismissedToEnd) {
-                isRemoved = true
-                true
+                showConfirmationDialog = true
+                isRemoved
             } else {
                 isRemoved = false
                 false
             }
         }
     )
+
+    ConfirmationDialog(
+        showDialog = showConfirmationDialog,
+        title = onDeletionTitle,
+        message = onDeletionMessage,
+        onConfirm = {
+            isConfirmed = true
+            isRemoved = true
+            onConfirmDeletion()
+        },
+        onDismiss = {
+            isConfirmed = false
+            showConfirmationDialog = false
+        }
+    )
+
+
 
     LaunchedEffect(key1 = isRemoved) {
         if (isRemoved) {
@@ -69,7 +96,9 @@ fun <T> SwipeToDeleteContainer(
         SwipeToDismiss(
             state = state,
             background = {
-                DeleteBackground(swipeDismissState = state)
+                if (isRemoved) {
+                    DeleteBackground(state)
+                }
             },
             dismissContent = { content(item) },
             directions = setOf(DismissDirection.StartToEnd)
@@ -87,7 +116,8 @@ fun DeleteBackground(
             Color.Red
         } else Color.Transparent
 
-    val alignment = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
+    val alignment =
+        if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) Alignment.CenterEnd
         else Alignment.CenterStart
 
     Box(
