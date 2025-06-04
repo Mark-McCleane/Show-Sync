@@ -263,8 +263,12 @@ fun TvShowEpisodeChecker(
                                     text = seasonEpisodeText,
                                     modifier = Modifier.padding(bottom = 5.dp)
                                 )
-                                RatingSection(tvShowSeasonEpisodes = seasonEpisode, formatAirDate(seasonEpisode.episodeAirDate))
-                            }, supportingContent = {
+                                RatingSection(
+                                    tvShowSeasonEpisodes = seasonEpisode,
+                                    formatAirDate(seasonEpisode.episodeAirDate)
+                                )
+                            },
+                            supportingContent = {
                                 Text(
                                     text = seasonEpisode.overview,
                                     modifier = if (isCensored && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
@@ -280,7 +284,8 @@ fun TvShowEpisodeChecker(
                                     },
                                     maxLines = if (isExpanded) Int.MAX_VALUE else 3
                                 )
-                            }, overlineContent = {},
+                            },
+                            overlineContent = {},
                             leadingContent = {
                                 val manuallyRevealed =
                                     rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
@@ -307,20 +312,23 @@ fun TvShowEpisodeChecker(
                                         }
                                         .blur(blurValue)
                                 )
-                            }, trailingContent = {
+                            },
+                            trailingContent = {
                                 Checkbox(
                                     checked = seasonEpisode.isChecked,
                                     onCheckedChange = null,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
-                            }, modifier = Modifier.clickable {
+                            },
+                            modifier = Modifier.clickable {
                                 val newWatchedState = !(seasonEpisode.isChecked)
                                 onEpisodeWatchedToggle(
                                     seasonEpisode.episodeId,
                                     newWatchedState,
                                     seasonSelected
                                 )
-                            })
+                            }
+                        )
                         Divider()
                     }
                 }
