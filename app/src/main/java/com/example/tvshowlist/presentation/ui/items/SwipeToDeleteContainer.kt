@@ -16,6 +16,7 @@ import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissDefaults
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +40,7 @@ fun <T> SwipeToDeleteContainer(
     onDeletionTitle: String,
     onDeletionMessage: String,
     content: @Composable (T) -> Unit,
-    ) {
+) {
     var isRemoved by remember {
         mutableStateOf(false)
     }
@@ -59,7 +60,8 @@ fun <T> SwipeToDeleteContainer(
                 isRemoved = false
                 false
             }
-        }
+        },
+        positionalThreshold = { totalDistance -> totalDistance * 0.5f }
     )
 
     ConfirmationDialog(
@@ -96,9 +98,7 @@ fun <T> SwipeToDeleteContainer(
         SwipeToDismiss(
             state = state,
             background = {
-                if (isRemoved) {
-                    DeleteBackground(state)
-                }
+                DeleteBackground(state)
             },
             dismissContent = { content(item) },
             directions = setOf(DismissDirection.StartToEnd)
