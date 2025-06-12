@@ -29,7 +29,7 @@ import java.util.Locale
 
 @OptIn(FlowPreview::class)
 class MainViewModel(
-    private val repository: TvShowsRepository
+    private val repository: TvShowsRepository,
 ) : ViewModel() {
     private val _episodeCheckerUIState = MutableStateFlow(EpisodeCheckerUIState())
     val episodeCheckerUIState = _episodeCheckerUIState.asStateFlow()
@@ -134,6 +134,7 @@ class MainViewModel(
 
     fun getTvShowSeasons(tvShowId: Int, seasonNumber: Int = 1) {
         viewModelScope.launch {
+            _isLoading.update { true }
             _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = true) }
             try {
                 val apiResult = repository.getTvShowSeason(tvShowId, seasonNumber)
@@ -148,11 +149,13 @@ class MainViewModel(
                 _error.update { e.localizedMessage ?: "No error found" }
             }
             _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = false) }
+            _isLoading.update { false }
         }
     }
 
     fun getTvShowSeasonsOffline(tvShowId: Int, seasonSelected: Int) {
         viewModelScope.launch {
+            _isLoading.update { true }
             _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = true) }
             try {
                 val databaseResult = repository.getTvShowSeasonOffline(tvShowId, seasonSelected)
@@ -161,6 +164,7 @@ class MainViewModel(
                 _error.update { e.localizedMessage ?: "No error found" }
             }
             _episodeCheckerUIState.update { state -> state.copy(isEpisodesLoaded = false) }
+            _isLoading.update { false }
         }
     }
 
@@ -182,7 +186,8 @@ class MainViewModel(
     }
 
     private fun checkAllButtonChecker(seasonNumber: Int) {
-        val episodesInSeason = _episodeCheckerUIState.value.seasonEpisodes.filter { it.seasonNumber == seasonNumber }
+        val episodesInSeason =
+            _episodeCheckerUIState.value.seasonEpisodes.filter { it.seasonNumber == seasonNumber }
 
         // Handle empty list case
         val allSameValue = episodesInSeason.isEmpty() ||
@@ -230,7 +235,10 @@ class MainViewModel(
             val date = LocalDate.parse(episodeAirDate, inputFormatter)
             date.format(outputFormatter)
         } catch (e: DateTimeParseException) {
-            Log.e("Date Format Exception", "Failed To Format Date: $episodeAirDate\n ${e.localizedMessage ?: ""}")
+            Log.e(
+                "Date Format Exception",
+                "Failed To Format Date: $episodeAirDate\n ${e.localizedMessage ?: ""}"
+            )
             episodeAirDate
         }
     }
