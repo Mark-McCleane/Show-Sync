@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.tvshowlist.R
 import com.example.tvshowlist.data.remote.RetrofitInterface
 import com.example.tvshowlist.domain.model.TvShow
@@ -53,13 +57,19 @@ fun ItemTvShow(
     navigateTo: (tvShow: TvShow) -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     ListItem(
         modifier = Modifier
             .clickable { navigateTo(tvShow) },
         leadingContent = {
             AsyncImage(
-                model = RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath,
+                model = ImageRequest.Builder(context)
+                    .data(RetrofitInterface.IMAGE_BASE_URL + tvShow.posterPath)
+                    .crossfade(true)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build(),
                 contentDescription = stringResource(
                     R.string.tvShowTitle_cover_image,
                     tvShow.title
@@ -67,8 +77,7 @@ fun ItemTvShow(
                 error = painterResource(id = R.drawable.show_sync_backgroundless_logo),
                 contentScale = ContentScale.Fit,
                 placeholder = painterResource(id = R.drawable.show_sync_backgroundless_logo),
-                modifier = Modifier
-                    .widthIn(min = 75.dp, max = 110.dp)
+                modifier = Modifier.widthIn(min = 75.dp, max = 110.dp)
             )
         },
         headlineContent = {

@@ -55,6 +55,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.tvshowlist.R
 import com.example.tvshowlist.domain.model.TvShowExtended
 import com.example.tvshowlist.domain.model.TvShowSeasonEpisodes
@@ -77,7 +80,7 @@ fun TvShowEpisodeChecker(
     navigateBack: () -> Unit,
     onSeasonSelected: (Int) -> Unit,
     onEpisodeWatchedToggle: (Int, Boolean, Int) -> Unit,
-    onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean, Int) -> Unit
+    onCheckAllEpisodes: (List<TvShowSeasonEpisodes>, Boolean, Int) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -154,8 +157,7 @@ fun TvShowEpisodeChecker(
                 ) {
                     Text(
                         text = if (seasonSelected > 0) stringResource(
-                            R.string.season_selected_number,
-                            seasonSelected
+                            R.string.season_selected_number, seasonSelected
                         ) else stringResource(
                             R.string.top_episodes
                         ),
@@ -225,8 +227,7 @@ fun TvShowEpisodeChecker(
                                 checkAll = !checkAll
                             }
                             .fillMaxWidth()
-                            .padding(0.dp)
-                    ) {
+                            .padding(0.dp)) {
                         Divider()
                         ListItem(modifier = Modifier, headlineContent = {
                             Text(stringResource(R.string.check_all), modifier = Modifier)
@@ -242,8 +243,7 @@ fun TvShowEpisodeChecker(
                 ) {
                     itemsIndexed(
                         items = currentSeasonEpisodes,
-                        key = { _, episode -> episode.episodeId }
-                    ) { index, seasonEpisode ->
+                        key = { _, episode -> episode.episodeId }) { index, seasonEpisode ->
                         var isExpanded by rememberSaveable(seasonEpisode.episodeId) {
                             mutableStateOf(
                                 false
@@ -255,80 +255,72 @@ fun TvShowEpisodeChecker(
                             )
                         }
 
-                        ListItem(
-                            headlineContent = {
-                                val seasonEpisodeText =
-                                    if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}"
-                                Text(
-                                    text = seasonEpisodeText,
-                                    modifier = Modifier.padding(bottom = 5.dp)
-                                )
-                                RatingSection(
-                                    tvShowSeasonEpisodes = seasonEpisode,
-                                    formatAirDate(seasonEpisode.episodeAirDate)
-                                )
-                            },
-                            supportingContent = {
-                                Text(
-                                    text = seasonEpisode.overview,
-                                    modifier = if (isCensored && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked)
-                                        Modifier
-                                            .clickable {
-                                                isExpanded = !isExpanded
-                                                isTextEnabled = !isTextEnabled
-                                            }
-                                            .blur(15.dp)
-                                    else Modifier.clickable {
+                        ListItem(headlineContent = {
+                            val seasonEpisodeText =
+                                if (seasonSelected > 0) "${seasonEpisode.episodeNumber}. ${seasonEpisode.episodeName}" else "${index + 1}. (${seasonEpisode.seasonNumber}X${seasonEpisode.episodeNumber}) ${seasonEpisode.episodeName}"
+                            Text(
+                                text = seasonEpisodeText,
+                                modifier = Modifier.padding(bottom = 5.dp)
+                            )
+                            RatingSection(
+                                tvShowSeasonEpisodes = seasonEpisode,
+                                formatAirDate(seasonEpisode.episodeAirDate)
+                            )
+                        }, supportingContent = {
+                            Text(
+                                text = seasonEpisode.overview,
+                                modifier = if (isCensored && !isTextEnabled && index != 0 && !currentSeasonEpisodes[index - 1].isChecked) Modifier
+                                    .clickable {
                                         isExpanded = !isExpanded
                                         isTextEnabled = !isTextEnabled
-                                    },
-                                    maxLines = if (isExpanded) Int.MAX_VALUE else 3
-                                )
-                            },
-                            overlineContent = {},
-                            leadingContent = {
-                                val manuallyRevealed =
-                                    rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
-
-                                val blurValue =
-                                    if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked || !isCensored) {
-                                        0.dp
-                                    } else {
-                                        15.dp
                                     }
+                                    .blur(15.dp)
+                                else Modifier.clickable {
+                                    isExpanded = !isExpanded
+                                    isTextEnabled = !isTextEnabled
+                                },
+                                maxLines = if (isExpanded) Int.MAX_VALUE else 3
+                            )
+                        }, overlineContent = {}, leadingContent = {
+                            val manuallyRevealed =
+                                rememberSaveable(seasonEpisode.episodeId) { mutableStateOf(false) }
 
-                                AsyncImage(
-                                    model = seasonEpisode.episodeImage,
-                                    error = painterResource(id = android.R.drawable.stat_notify_error),
-                                    contentDescription = stringResource(
-                                        R.string.episode_image,
-                                        seasonEpisode.episodeName
-                                    ),
-                                    contentScale = ContentScale.Fit,
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .clickable {
-                                            manuallyRevealed.value = !manuallyRevealed.value
-                                        }
-                                        .blur(blurValue)
-                                )
-                            },
-                            trailingContent = {
-                                Checkbox(
-                                    checked = seasonEpisode.isChecked,
-                                    onCheckedChange = null,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                            },
-                            modifier = Modifier.clickable {
-                                val newWatchedState = !(seasonEpisode.isChecked)
-                                onEpisodeWatchedToggle(
-                                    seasonEpisode.episodeId,
-                                    newWatchedState,
-                                    seasonSelected
-                                )
-                            }
-                        )
+                            val blurValue =
+                                if (manuallyRevealed.value || index == 0 || currentSeasonEpisodes[index - 1].isChecked || !isCensored) {
+                                    0.dp
+                                } else {
+                                    15.dp
+                                }
+
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(seasonEpisode.episodeImage).crossfade(true)
+                                    .memoryCachePolicy(CachePolicy.ENABLED)
+                                    .diskCachePolicy(CachePolicy.ENABLED)
+                                    .build(),
+                                error = painterResource(id = android.R.drawable.stat_notify_error),
+                                contentDescription = stringResource(
+                                    R.string.episode_image, seasonEpisode.episodeName
+                                ),
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clickable {
+                                        manuallyRevealed.value = !manuallyRevealed.value
+                                    }
+                                    .blur(blurValue))
+                        }, trailingContent = {
+                            Checkbox(
+                                checked = seasonEpisode.isChecked,
+                                onCheckedChange = null,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }, modifier = Modifier.clickable {
+                            val newWatchedState = !(seasonEpisode.isChecked)
+                            onEpisodeWatchedToggle(
+                                seasonEpisode.episodeId, newWatchedState, seasonSelected
+                            )
+                        })
                         Divider()
                     }
                 }
