@@ -6,13 +6,18 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,8 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,21 +50,12 @@ import com.example.tvshowlist.domain.model.TvShow
 fun ItemTvShow(
     tvShow: TvShow,
     modifier: Modifier = Modifier,
-    navigateTo: (tvShow: TvShow) -> Unit
+    navigateTo: (tvShow: TvShow) -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    val clickableModifier = Modifier.clickable(
-        indication = rememberRipple(bounded = true, radius = 32.dp),
-        interactionSource = remember { MutableInteractionSource() }
-    ) { isExpanded = !isExpanded }
-
-    var clickableHeight by remember {
-        mutableIntStateOf(IntSize.Zero.height)
-    }
 
     ListItem(
         modifier = Modifier
-            .padding(0.dp)
             .clickable { navigateTo(tvShow) },
         leadingContent = {
             AsyncImage(
@@ -66,15 +64,11 @@ fun ItemTvShow(
                     R.string.tvShowTitle_cover_image,
                     tvShow.title
                 ),
-                error = painterResource(id = android.R.drawable.stat_notify_error),
+                error = painterResource(id = R.drawable.show_sync_backgroundless_logo),
                 contentScale = ContentScale.Fit,
+                placeholder = painterResource(id = R.drawable.show_sync_backgroundless_logo),
                 modifier = Modifier
-                    .onSizeChanged {
-                        if (clickableHeight < it.height / 2) {
-                            clickableHeight = it.height / 2
-                        }
-                    }
-                    .width(110.dp)
+                    .widthIn(min = 75.dp, max = 110.dp)
             )
         },
         headlineContent = {
@@ -90,11 +84,6 @@ fun ItemTvShow(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onSizeChanged {
-                        if (clickableHeight < it.height / 2) {
-                            clickableHeight = it.height / 2
-                        }
-                    }
             ) {
                 Text(
                     text = tvShow.description?.ifEmpty { stringResource(R.string.no_description_found) }
@@ -119,17 +108,16 @@ fun ItemTvShow(
             else painterResource(
                 android.R.drawable.arrow_down_float
             )
-
-            Column(
-                modifier = clickableModifier
-                    .heightIn(min = 200.dp, max = clickableHeight.dp)
-                    .padding(vertical = 16.dp, horizontal = 9.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            IconButton(
+                onClick = {
+                    isExpanded = !isExpanded
+                },
+                modifier = Modifier
             ) {
                 Icon(
                     painter = expandableArrow,
                     contentDescription = null,
+                    modifier = Modifier.clipToBounds()
                 )
             }
         },
