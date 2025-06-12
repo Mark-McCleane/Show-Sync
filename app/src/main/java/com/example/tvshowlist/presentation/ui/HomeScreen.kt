@@ -83,35 +83,36 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(
-            title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(size = 50.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.app_name)
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(R.drawable.show_sync_backgroundless_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(size = 50.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.app_name)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { navigateToSettings() }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings)
+                        )
+                    }
                 }
-            },
-            actions = {
-                IconButton(onClick = { navigateToSettings() }) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.settings)
-                    )
-                }
-            }
-        )
-    }, snackbarHost = {
-        SnackbarHost(hostState = snackbarHostState)
-    }
-
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -205,7 +206,6 @@ fun HomeScreen(
                                     )
                                 }
                                 Divider(modifier = Modifier.fillMaxWidth())
-
                             }
                         }
                     }

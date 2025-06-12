@@ -84,6 +84,7 @@ class MainViewModel(
     }
 
     private suspend fun getTvShows(query: String = ""): List<TvShow> {
+        _isLoading.update { true }
         val duplicateRemoverSet = mutableSetOf<Result>()
         try {
             val temp = repository.getTVShows(query).results
@@ -95,10 +96,12 @@ class MainViewModel(
         }
         val tvShowList = AppMapper.mapGetTvShowsApiResultToTvShowList(duplicateRemoverSet.toList())
         _tvShowList.update { tvShowList }
+        _isLoading.update { false }
         return tvShowList
     }
 
     suspend fun getRecentTvShows() {
+        _isLoading.update { true }
         val duplicateRemoverSet = mutableSetOf<TvShow>()
         repository.getRecentTvShows().collect { tvShowList ->
             tvShowList.forEach {
@@ -106,6 +109,8 @@ class MainViewModel(
             }
         }
         _recentTvShowList.update { duplicateRemoverSet.toList() }
+        _isLoading.update { false }
+
     }
 
     fun insertRecentTvShow(tvShow: TvShow) {
