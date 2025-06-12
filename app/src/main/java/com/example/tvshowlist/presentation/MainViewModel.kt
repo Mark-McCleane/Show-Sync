@@ -110,7 +110,6 @@ class MainViewModel(
         }
         _recentTvShowList.update { duplicateRemoverSet.toList() }
         _isLoading.update { false }
-
     }
 
     fun insertRecentTvShow(tvShow: TvShow) {
