@@ -68,6 +68,7 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val error by viewModel.error.collectAsState()
     val context = LocalContext.current
+    val noInternetWarningText = stringResource(R.string.no_internet_connection)
 
     LaunchedEffect(recentTvShowList) {
         viewModel.getRecentTvShows()
@@ -76,7 +77,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                message = if (!ApplicationOnlineChecker.isOnline(context)) "No Internet Connection" else error,
+                message = if (!ApplicationOnlineChecker.isOnline(context)) noInternetWarningText else error,
                 withDismissAction = true,
                 duration = SnackbarDuration.Indefinite
             )
